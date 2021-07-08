@@ -1,0 +1,13 @@
+### EC21
+
+## Library for EC21
+
+- HTTP_POST
+- HTTP_PUT
+- HTTP_GET
+- PING_TEST
+- FILE_DOWNLOAD(Reccomends Large SPIFFS 16MB with OTA)
+- OTA
+- SIM_INFO
+- MODULE_INFO
+
