@@ -80,7 +80,7 @@ void QuectelEC21module::setup()
 		#endif
 	}
 
-	if (setAPN(operaterAPN)
+	if (setAPN(operaterAPN))
 	{
 		#if ENABLE_DEBUG
 		Serial.println("Set Operater APN");
