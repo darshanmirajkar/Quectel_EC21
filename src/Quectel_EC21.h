@@ -19,7 +19,7 @@
 
 #define LTE_RX_PIN 5
 #define LTE_TX_PIN 2
-
+#define LTE_SERIAL_PORT &Serial1
 //#define Macro(x)  (((x) > (10)) ? (abc()) : 2)
 class QuectelEC21module
 {
@@ -53,6 +53,8 @@ public:
   void begin(); //Default baud 115200
   void begin(uint32_t baud);
   void begin(uint32_t baud, uint32_t config, int8_t rxPin, int8_t txPin);
+  void setup();
+  void basicSetup();
   bool SetAT();
   bool enableECHO();
   void initilizeModule();

@@ -9,42 +9,7 @@ QuectelEC21module lte;
 void setup() {
 	delay(5000); // To avoid ESP32 boot Fail
   	Serial.begin(115200);
-	lte.SelectSerial(&Serial1); //Select the serial port
-	lte.begin(115200, SERIAL_8N1, LTE_RX_PIN, LTE_TX_PIN);
-	lte.initilizeModule();
-	Serial.println("\nSearching For network..");
-	if (lte.checkforNetwork())
-	{
-		Serial.println("Network Found");
-	}
-	else
-	{
-		Serial.print(".");
-	}
-
-	if (lte.enableECHO())
-	{
-		Serial.println("Echo Enabled");
-	}
-
-	if (lte.disConnectNetwork())
-	{
-		Serial.println("Disconnected to internet");
-	}
-
-	if (lte.setAPN("move.dataxs.mobi"))
-	{
-		Serial.println("Set Operater APN");
-	}else{
-		Serial.println("Failed to set APN");
-	}
-
-	if (lte.connectNetwork())
-	{
-		Serial.println("Connected to Internet");
-	}else{
-		Serial.println("Failed to connect Internet");
-	}
+	lte.setup();
 
   	delay(2000);
 }
