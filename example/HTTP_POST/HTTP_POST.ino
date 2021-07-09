@@ -7,7 +7,7 @@
 #define LTE_RX_PIN 5
 #define LTE_TX_PIN 2
 
-LTEmodule lte;
+QuectelEC21module lte;
 
 void setup() {
 	delay(5000); // To avoid ESP32 boot Fail

@@ -1,6 +1,6 @@
 
-#ifndef LTE_h
-#define LTE_h
+#ifndef QUECTEL_EC21_h
+#define QUECTEL_EC21_h
 #include "Arduino.h"
 #include "SPIFFS.h"
 #include "MD5Builder.h"
@@ -15,10 +15,10 @@
 #define SET_AT_TIMEOUT 10000 //in ms
 #define ENABLE_DEBUG 0  // 0 - Disable, 1 - level1 , 2 - level2
 
-#define LTE_RESET 12
+#define EC21_RESET 12
 
 //#define Macro(x)  (((x) > (10)) ? (abc()) : 2)
-class LTEmodule
+class QuectelEC21module
 {
 private:
   int NumofRetry = 3;
@@ -43,7 +43,7 @@ private:
   HardwareSerial *_Serial;
 
 public:
-  LTEmodule();
+  QuectelEC21module();
   int _timeout;
   bool initilize = false;
   void SelectSerial(HardwareSerial *theSerial);
@@ -75,7 +75,7 @@ public:
   size_t getFileSize(char *filename);
   int readFile(const char *filename);
   int updateESP(char *md5Checksum);
-  bool setLTE();
+  bool resetSettings();
   /**Module Info**/
   String getIMEI();
   String getSerialNumber();

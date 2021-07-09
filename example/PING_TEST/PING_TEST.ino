@@ -2,16 +2,16 @@
 
 
 #include <Arduino.h>
-#include "LTE.h"
+#include "Quectel_EC21.h"
 
 #define LTE_RX_PIN 5
 #define LTE_TX_PIN 2
 
 unsigned long previousMillis = 0;        // will store last time LED was updated
 // constants won't change:
-const long interval = 1000;           // interval at which to blink (milliseconds)
+const long interval = 10000;           // interval at which to blink (milliseconds)
 
-LTEmodule lte;
+QuectelEC21module lte;
 
 void setup() {
 	delay(5000); // To avoid ESP32 boot Fail
@@ -70,5 +70,4 @@ void loop() {
       			Serial.println("Ping Failed");
     		}
   	}
-  	delay(10000);
 }

@@ -2,15 +2,15 @@
 
 
 #include <Arduino.h>
-#include "LTE.h"
+#include "Quectel_EC21.h"
 
 #define LTE_RX_PIN 5
 #define LTE_TX_PIN 2
 
 char* downloadURL = "https://2005.filemail.com/api/file/get?filekey=8sj-7kgCWq5aq_GY1s_vM7DScpoMSZKTrHcXvcmp2j5RD6o7RId3JilWCDFfJQ";
-char* checksum = "/test.bin";
+char* checksum = "MD5 checksum_of_file";
 
-LTEmodule lte;
+QuectelEC21module lte;
 
 void setup() {
 	delay(5000); // To avoid ESP32 boot Fail
@@ -60,5 +60,5 @@ void setup() {
 void loop() {
   	/* OTA Example */
   	lte.downloadUpdate(downloadURL, checksum);
-  	While(1);
+  	while(1);
   }

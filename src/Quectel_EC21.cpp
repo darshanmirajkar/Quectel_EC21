@@ -1,57 +1,56 @@
-#include "Arduino.h"
-#include "LTE.h"
+#include "Quectel_EC21.h"
 
-LTEmodule::LTEmodule()
+QuectelEC21module::QuectelEC21module()
 {
 	_Serial = NULL;
 }
 
-void LTEmodule::SelectSerial(HardwareSerial *theSerial)
+void QuectelEC21module::SelectSerial(HardwareSerial *theSerial)
 {
 	_Serial = theSerial;
 }
 
-bool LTEmodule::hardRestart()
+bool QuectelEC21module::hardRestart()
 {
-	digitalWrite(LTE_RESET, LOW);
+	digitalWrite(EC21_RESET, LOW);
 	delay(1000);
-	digitalWrite(LTE_RESET, HIGH);
+	digitalWrite(EC21_RESET, HIGH);
 }
 
-void LTEmodule::begin()
+void QuectelEC21module::begin()
 {
-	pinMode(LTE_RESET, OUTPUT);
-	digitalWrite(LTE_RESET, HIGH);
+	pinMode(EC21_RESET, OUTPUT);
+	digitalWrite(EC21_RESET, HIGH);
 	_baud = DEFAULT_BAUD_RATE; // Default baud rate 115200
 	_Serial->begin(_baud);
 	_buffer.reserve(BUFFER_RESERVE_MEMORY);
 }
 
-void LTEmodule::Retry(uint16_t NumofRetrys, uint16_t RetryDelays)
+void QuectelEC21module::Retry(uint16_t NumofRetrys, uint16_t RetryDelays)
 {
 	NumofRetry = NumofRetrys;
 	RetryDelay = RetryDelays;
 }
 
-void LTEmodule::begin(uint32_t baud)
+void QuectelEC21module::begin(uint32_t baud)
 {
-	pinMode(LTE_RESET, OUTPUT);
-	digitalWrite(LTE_RESET, HIGH);
+	pinMode(EC21_RESET, OUTPUT);
+	digitalWrite(EC21_RESET, HIGH);
 	_baud = baud;
 	_Serial->begin(_baud);
 	_buffer.reserve(BUFFER_RESERVE_MEMORY);
 }
 
-void LTEmodule::begin(uint32_t baud, uint32_t config, int8_t rxPin, int8_t txPin)
+void QuectelEC21module::begin(uint32_t baud, uint32_t config, int8_t rxPin, int8_t txPin)
 {
-	pinMode(LTE_RESET, OUTPUT);
-	digitalWrite(LTE_RESET, HIGH);
+	pinMode(EC21_RESET, OUTPUT);
+	digitalWrite(EC21_RESET, HIGH);
 	_baud = baud;
 	_Serial->begin(_baud, config, rxPin, txPin);
 	_buffer.reserve(BUFFER_RESERVE_MEMORY);
 }
 
-bool LTEmodule::SetAT()
+bool QuectelEC21module::SetAT()
 {
 	int count = 0;
 	do
@@ -76,7 +75,7 @@ bool LTEmodule::SetAT()
 	}
 }
 
-bool LTEmodule::enableECHO()
+bool QuectelEC21module::enableECHO()
 {
 	int count = 0;
 	do
@@ -99,7 +98,7 @@ bool LTEmodule::enableECHO()
 	}
 }
 
-void LTEmodule::initilizeModule(){
+void QuectelEC21module::initilizeModule(){
 	if (!SPIFFS.begin(true))
 	{
 		Serial.println("SPIFFS Mount Failed");
@@ -121,7 +120,7 @@ void LTEmodule::initilizeModule(){
 	}
 }
 
-bool LTEmodule::configureModule()
+bool QuectelEC21module::configureModule()
 {
 	uint8_t flag1;
 	uint8_t flag2;
@@ -218,7 +217,7 @@ bool LTEmodule::configureModule()
 	}
 }
 
-bool LTEmodule::checkforNetwork()
+bool QuectelEC21module::checkforNetwork()
 {
 	int count = 0;
 	do
@@ -252,7 +251,7 @@ bool LTEmodule::checkforNetwork()
 	}
 }
 
-bool LTEmodule::setLTE()
+bool QuectelEC21module::resetSettings()
 {
 	int count = 0;
 	do
@@ -274,7 +273,7 @@ bool LTEmodule::setLTE()
 	}
 }
 
-int LTEmodule::getRssi()
+int QuectelEC21module::getRssi()
 {
 	int count = 0;
 	String Rssi;
@@ -307,7 +306,7 @@ int LTEmodule::getRssi()
 	}
 }
 
-String LTEmodule::getOperater()
+String QuectelEC21module::getOperater()
 {
 	int count = 0;
 	String operater;
@@ -331,7 +330,7 @@ String LTEmodule::getOperater()
 	}
 }
 
-String LTEmodule::getNetworkType()
+String QuectelEC21module::getNetworkType()
 {
 	int count = 0;
 	String operater;
@@ -355,7 +354,7 @@ String LTEmodule::getNetworkType()
 	}
 }
 
-String LTEmodule::getBandInfo()
+String QuectelEC21module::getBandInfo()
 {
 	int count = 0;
 	String band;
@@ -381,7 +380,7 @@ String LTEmodule::getBandInfo()
 	}
 }
 
-bool LTEmodule::setAPN(const char *apn)
+bool QuectelEC21module::setAPN(const char *apn)
 {
 	int count = 0;
 	do
@@ -407,7 +406,7 @@ bool LTEmodule::setAPN(const char *apn)
 	}
 }
 
-String LTEmodule::getIMEI()
+String QuectelEC21module::getIMEI()
 {
 	String response = "";
 	int count = 0;
@@ -433,7 +432,7 @@ String LTEmodule::getIMEI()
 	}
 }
 
-String LTEmodule::getModelNumber()
+String QuectelEC21module::getModelNumber()
 {
 	String response = "";
 	int count = 0;
@@ -459,7 +458,7 @@ String LTEmodule::getModelNumber()
 	}
 }
 
-String LTEmodule::getSerialNumber()
+String QuectelEC21module::getSerialNumber()
 {
 	String response = "";
 	int count = 0;
@@ -485,7 +484,7 @@ String LTEmodule::getSerialNumber()
 	}
 }
 
-String LTEmodule::getManufacturer()
+String QuectelEC21module::getManufacturer()
 {
 	String response = "";
 	int count = 0;
@@ -511,7 +510,7 @@ String LTEmodule::getManufacturer()
 	}
 }
 
-String LTEmodule::getSimNumber()
+String QuectelEC21module::getSimNumber()
 {
 	String response = "";
 	int count = 0;
@@ -537,7 +536,7 @@ String LTEmodule::getSimNumber()
 	}
 }
 
-bool LTEmodule::simPresence()
+bool QuectelEC21module::simPresence()
 {
 	String response = "";
 	int count = 0;
@@ -570,7 +569,7 @@ bool LTEmodule::simPresence()
 	}
 }
 
-void LTEmodule::getModuleInfo()
+void QuectelEC21module::getModuleInfo()
 {
 	String manufacturarer = getManufacturer();
 	String model = getModelNumber();
@@ -582,7 +581,7 @@ void LTEmodule::getModuleInfo()
 	Serial.println("S/N          : " + serialNumber);
 }
 
-void LTEmodule::getSimInfo()
+void QuectelEC21module::getSimInfo()
 {
 	if (simPresence())
 	{
@@ -605,7 +604,7 @@ void LTEmodule::getSimInfo()
 	}
 }
 
-bool LTEmodule::connectNetwork()
+bool QuectelEC21module::connectNetwork()
 {
 	int count = 0;
 
@@ -630,7 +629,7 @@ bool LTEmodule::connectNetwork()
 	}
 }
 
-bool LTEmodule::disConnectNetwork()
+bool QuectelEC21module::disConnectNetwork()
 {
 	int count = 0;
 	do
@@ -654,7 +653,7 @@ bool LTEmodule::disConnectNetwork()
 	}
 }
 
-bool LTEmodule::terminateHTTP()
+bool QuectelEC21module::terminateHTTP()
 {
 	int count = 0;
 	do
@@ -677,7 +676,7 @@ bool LTEmodule::terminateHTTP()
 	}
 }
 
-bool LTEmodule::ping(String url)
+bool QuectelEC21module::ping(String url)
 {
 	int count = 0;
 	do
@@ -707,7 +706,7 @@ bool LTEmodule::ping(String url)
 	}
 }
 
-size_t LTEmodule::getFileSize(char *filename)
+size_t QuectelEC21module::getFileSize(char *filename)
 {
 	int count = 0;
 	do
@@ -731,7 +730,7 @@ size_t LTEmodule::getFileSize(char *filename)
 	}
 }
 
-bool LTEmodule::deleteFile(String filename)
+bool QuectelEC21module::deleteFile(String filename)
 {
 	int count = 0;
 	do
@@ -757,7 +756,7 @@ bool LTEmodule::deleteFile(String filename)
 	}
 }
 
-int LTEmodule::updateESP(char *md5Checksum)
+int QuectelEC21module::updateESP(char *md5Checksum)
 {
 	uint8_t fileHandler = 0;
 	uint16_t chunkSize = DOWNLOAD_CHUNK_SIZE;
@@ -895,7 +894,7 @@ int LTEmodule::updateESP(char *md5Checksum)
 	}
 }
 
-int LTEmodule::readFile(const char *filename)
+int QuectelEC21module::readFile(const char *filename)
 {
 	uint8_t fileHandler = 0;
 	uint16_t chunkSize = DOWNLOAD_CHUNK_SIZE;
@@ -1023,7 +1022,7 @@ int LTEmodule::readFile(const char *filename)
 	}
 }
 
-bool LTEmodule::PostHTTP(const char *URL, const char *message)
+bool QuectelEC21module::PostHTTP(const char *URL, const char *message)
 {
 	uint8_t flag1;
 	uint8_t flag2;
@@ -1127,7 +1126,7 @@ bool LTEmodule::PostHTTP(const char *URL, const char *message)
 	// delay(100);
 }
 
-bool LTEmodule::GetHTTP(const char *URL, const char *message)
+bool QuectelEC21module::GetHTTP(const char *URL, const char *message)
 {
 	uint8_t flag1;
 	uint8_t flag2;
@@ -1231,7 +1230,7 @@ bool LTEmodule::GetHTTP(const char *URL, const char *message)
 	// delay(100);
 }
 
-bool LTEmodule::downloadUpdate(const char *URL, char *md5Checksum)
+bool QuectelEC21module::downloadUpdate(const char *URL, char *md5Checksum)
 {
 	uint8_t flag1;
 	uint8_t flag2;
@@ -1334,7 +1333,7 @@ bool LTEmodule::downloadUpdate(const char *URL, char *md5Checksum)
 	}
 }
 
-bool LTEmodule::downloadFile(const char *URL, const char *filename)
+bool QuectelEC21module::downloadFile(const char *URL, const char *filename)
 {
 	uint8_t flag1;
 	uint8_t flag2;
@@ -1437,7 +1436,7 @@ bool LTEmodule::downloadFile(const char *URL, const char *filename)
 	}
 }
 
-bool LTEmodule::PutHTTP(const char *URL, const char *message)
+bool QuectelEC21module::PutHTTP(const char *URL, const char *message)
 {
 	uint8_t flag1;
 	uint8_t flag2;
@@ -1541,7 +1540,7 @@ bool LTEmodule::PutHTTP(const char *URL, const char *message)
 	// delay(100);
 }
 
-String LTEmodule::HTTPread()
+String QuectelEC21module::HTTPread()
 {
 	int count = 0;
 	String response = "";
@@ -1566,7 +1565,7 @@ String LTEmodule::HTTPread()
 	return response;
 }
 
-String LTEmodule::SerialRead()
+String QuectelEC21module::SerialRead()
 {
 	_timeout = 0;
 	while (!_Serial->available() && _timeout < 12000)
@@ -1584,7 +1583,7 @@ String LTEmodule::SerialRead()
 ////
 //PRIVATE METHODS
 //
-String LTEmodule::_readSerial()
+String QuectelEC21module::_readSerial()
 {
 	uint64_t timeOld = millis();
 	while (!_Serial->available() || !(millis() > timeOld + TIME_OUT_READ_SERIAL))
@@ -1601,7 +1600,7 @@ String LTEmodule::_readSerial()
 	return str;
 }
 
-String LTEmodule::_readSerial(uint32_t timeout)
+String QuectelEC21module::_readSerial(uint32_t timeout)
 {
 	uint64_t timeOld = millis();
 	while (!_Serial->available() && !(millis() > timeOld + timeout))
@@ -1620,7 +1619,7 @@ String LTEmodule::_readSerial(uint32_t timeout)
 	return str;
 }
 
-String LTEmodule::_readSerialUntill(String buff, uint32_t timeout)
+String QuectelEC21module::_readSerialUntill(String buff, uint32_t timeout)
 {
 	uint64_t timeOld = millis();
 	String str = "";
@@ -1642,7 +1641,7 @@ String LTEmodule::_readSerialUntill(String buff, uint32_t timeout)
 	return str;
 }
 
-String LTEmodule::midString(String str, String start, String finish)
+String QuectelEC21module::midString(String str, String start, String finish)
 {
 	int locStart = str.indexOf(start);
 	if (locStart == -1)
@@ -1654,7 +1653,7 @@ String LTEmodule::midString(String str, String start, String finish)
 	return str.substring(locStart, locFinish);
 }
 
-String LTEmodule::midStringSecond(String str, String start, String finish)
+String QuectelEC21module::midStringSecond(String str, String start, String finish)
 {
 	int locStart = str.indexOf(start);
 	if (locStart == -1)
@@ -1672,7 +1671,7 @@ String LTEmodule::midStringSecond(String str, String start, String finish)
 	return (str.substring(locStart, locFinish));
 }
 
-String LTEmodule::file_md5(File &f)
+String QuectelEC21module::file_md5(File &f)
 {
 	if (!f)
 	{
@@ -1691,14 +1690,14 @@ String LTEmodule::file_md5(File &f)
 	return String();
 }
 
-String LTEmodule::getMD5checksum(const char *path)
+String QuectelEC21module::getMD5checksum(const char *path)
 {
 	File c = SPIFFS.open(path);
 	String md5str = file_md5(c);
 	return md5str;
 }
 
-String LTEmodule::storeFile(uint16_t rxBuffersize, uint32_t timeout)
+String QuectelEC21module::storeFile(uint16_t rxBuffersize, uint32_t timeout)
 {
 	uint64_t timeOld = millis();
 	String str = "";
@@ -1761,7 +1760,7 @@ String LTEmodule::storeFile(uint16_t rxBuffersize, uint32_t timeout)
 	return str;
 }
 
-String LTEmodule::storeFile(File f, uint16_t rxBuffersize, uint32_t timeout)
+String QuectelEC21module::storeFile(File f, uint16_t rxBuffersize, uint32_t timeout)
 {
 	uint64_t timeOld = millis();
 	String str = "";
@@ -1822,7 +1821,7 @@ String LTEmodule::storeFile(File f, uint16_t rxBuffersize, uint32_t timeout)
 	return str;
 }
 
-String LTEmodule::convertToString(char *a, int size)
+String QuectelEC21module::convertToString(char *a, int size)
 {
 	int i;
 	String s = "";
@@ -1833,7 +1832,7 @@ String LTEmodule::convertToString(char *a, int size)
 	return s;
 }
 
-int LTEmodule::numberOfDigits(uint16_t n)
+int QuectelEC21module::numberOfDigits(uint16_t n)
 {
 	int count = 0;
 	while (n != 0)
