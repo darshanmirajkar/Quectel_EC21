@@ -53,11 +53,11 @@ void QuectelEC21module::begin(uint32_t baud, uint32_t config, int8_t rxPin, int8
 
 void QuectelEC21module::setup()
 {
-	lte.SelectSerial(LTE_SERIAL_PORT); //Select the serial port
-	lte.begin(115200, SERIAL_8N1, LTE_RX_PIN, LTE_TX_PIN);
-	lte.initilizeModule();
+	SelectSerial(LTE_SERIAL_PORT); //Select the serial port
+	begin(115200, SERIAL_8N1, LTE_RX_PIN, LTE_TX_PIN);
+	initilizeModule();
 	Serial.println("\nSearching For network..");
-	if (lte.checkforNetwork())
+	if (checkforNetwork())
 	{
 		Serial.println("Network Found");
 	}
@@ -66,28 +66,28 @@ void QuectelEC21module::setup()
 		Serial.print(".");
 	}
 
-	if (lte.enableECHO())
+	if (enableECHO())
 	{
 		#if ENABLE_DEBUG
 		Serial.println("Echo Enabled");
 		#endif
 	}
 
-	if (lte.disConnectNetwork())
+	if (disConnectNetwork())
 	{
 		#if ENABLE_DEBUG
 		Serial.println("Disconnected to internet");
 		#endif
 	}
 
-	if (lte.setAPN("airtelgprs.com))
+	if (setAPN(operaterAPN)
 	{
 		#if ENABLE_DEBUG
 		Serial.println("Set Operater APN");
 		#endif
 	}
 
-	if (lte.connectNetwork())
+	if (connectNetwork())
 	{
 		Serial.println("Connected to Internet");
 	}else{
@@ -97,11 +97,11 @@ void QuectelEC21module::setup()
 
 void QuectelEC21module::basicSetup()
 {
-	lte.SelectSerial(LTE_SERIAL_PORT); //Select the serial port
-	lte.begin(115200, SERIAL_8N1, LTE_RX_PIN, LTE_TX_PIN);
-	lte.initilizeModule();
+	SelectSerial(LTE_SERIAL_PORT); //Select the serial port
+	begin(115200, SERIAL_8N1, LTE_RX_PIN, LTE_TX_PIN);
+	initilizeModule();
 	Serial.println("\nSearching For network..");
-	if (lte.checkforNetwork())
+	if (checkforNetwork())
 	{
 		Serial.println("Network Found");
 	}
@@ -110,7 +110,7 @@ void QuectelEC21module::basicSetup()
 		Serial.print(".");
 	}
 
-	if (lte.enableECHO())
+	if (enableECHO())
 	{
 		#if ENABLE_DEBUG
 		Serial.println("Echo Enabled");

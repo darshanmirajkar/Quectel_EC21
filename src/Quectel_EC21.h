@@ -20,12 +20,14 @@
 #define LTE_RX_PIN 5
 #define LTE_TX_PIN 2
 #define LTE_SERIAL_PORT &Serial1
+
 //#define Macro(x)  (((x) > (10)) ? (abc()) : 2)
 class QuectelEC21module
 {
 private:
   int NumofRetry = 3;
   // int NumofCustonRetry[5] = {1,2,3,4,5};
+  const char* operaterAPN = "airtelgprs.com";
   int RetryDelay = 50; //in ms
   int RetryDelay2 = 0; //in ms
   int MAX_Count = 10;
