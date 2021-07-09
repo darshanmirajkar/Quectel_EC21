@@ -4,9 +4,6 @@
 #include <Arduino.h>
 #include "LTE.h"
 
-#define LTE_RX_PIN 5
-#define LTE_TX_PIN 2
-
 QuectelEC21module lte;
 
 void setup() {

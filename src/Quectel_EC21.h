@@ -17,6 +17,9 @@
 
 #define EC21_RESET 12
 
+#define LTE_RX_PIN 5
+#define LTE_TX_PIN 2
+
 //#define Macro(x)  (((x) > (10)) ? (abc()) : 2)
 class QuectelEC21module
 {
