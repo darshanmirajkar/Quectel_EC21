@@ -19,7 +19,7 @@ void setup() {
 
 void loop() {
 
-  	lte.GetHTTP("https://run.mocky.io/v3/04a417d2-5288-4daa-aa41-ce4c1d21fbea", "message");  // HTTPS GET
+  	lte.GetHTTP("https://run.mocky.io/v3/04a417d2-5288-4daa-aa41-ce4c1d21fbea");  // HTTPS GET
   	String response = lte.HTTPread();
   	Serial.println("Response = " + response);       //Espected Output Response = 200 {"status":"received"}
   	delay(10000);
