@@ -56,7 +56,7 @@ void QuectelEC21module::setup()
 	SelectSerial(LTE_SERIAL_PORT); //Select the serial port
 	begin(115200, SERIAL_8N1, LTE_RX_PIN, LTE_TX_PIN);
 	initilizeModule();
-	Serial.println("\nSearching For network..");
+	Serial.println("Searching For network..");
 	if (checkforNetwork())
 	{
 		Serial.println("Network Found");
@@ -100,7 +100,7 @@ void QuectelEC21module::basicSetup()
 	SelectSerial(LTE_SERIAL_PORT); //Select the serial port
 	begin(115200, SERIAL_8N1, LTE_RX_PIN, LTE_TX_PIN);
 	initilizeModule();
-	Serial.println("\nSearching For network..");
+	Serial.println("Searching For network..");
 	if (checkforNetwork())
 	{
 		Serial.println("Network Found");
@@ -109,7 +109,6 @@ void QuectelEC21module::basicSetup()
 	{
 		Serial.print(".");
 	}
-
 	if (enableECHO())
 	{
 		#if ENABLE_DEBUG
@@ -124,15 +123,16 @@ bool QuectelEC21module::SetAT()
 	int count = 0;
 	do
 	{
-		_Serial->print(F("at\r\n"));
+		_Serial->print(F("AT\r\n"));
 
 		_buffer = _readSerial(200);
-		count++;
+		// count++;
 		delay(RetryDelay);
-	} while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("OK") == -1);
+	} while (/*(count < NumofRetry && count < MAX_Count) && */_buffer.indexOf("OK") == -1);
 	{
 		if ((_buffer.indexOf("OK")) == -1)
 		{
+			Serial.print(".");
 			return false;
 		}
 		else
@@ -149,7 +149,7 @@ bool QuectelEC21module::enableECHO()
 	int count = 0;
 	do
 	{
-		_Serial->print(F("ate1\r\n"));
+		_Serial->print(F("ATE1\r\n"));
 
 		_buffer = _readSerial(10);
 		count++;
@@ -173,19 +173,11 @@ void QuectelEC21module::initilizeModule(){
 		Serial.println("SPIFFS Mount Failed");
 	}
 	uint64_t timeOld = millis();
-	while (SetAT())
-	{
-		if(!(millis() > timeOld + SET_AT_TIMEOUT)){
-			Serial.print(".");
-		}else{
-			return;
-		}
-		
-	}
+	while (!SetAT() && !(millis() > timeOld + SET_AT_TIMEOUT));
 	if(configureModule()){
-		Serial.println("\nConfiguration Successfull");
+		Serial.println("Configuration Successfull");
 	}else{
-		Serial.println("\nConfiguration Failed");
+		Serial.println("Configuration Failed");
 	}
 }
 
@@ -676,7 +668,7 @@ void QuectelEC21module::getSimInfo()
 bool QuectelEC21module::connectNetwork()
 {
 	int count = 0;
-
+	int flag = false;
 	do
 	{
 		_Serial->print(F("AT+QIACT=1\r\n"));
@@ -689,11 +681,38 @@ bool QuectelEC21module::connectNetwork()
 	{
 		if (_buffer.indexOf("OK") == -1)
 		{
-			return false;
+			flag = false;
 		}
 		else
 		{
-			return true;
+			flag = true;
+		}
+	}
+	Serial.println("Cellular IPAddress : "+ getIPAddress());
+	return flag;
+}
+
+String QuectelEC21module::getIPAddress()
+{
+	int count = 0;
+
+	do
+	{
+		_Serial->print(F("AT+QIACT?\r\n"));
+		_buffer = _readSerial(100);
+		count++;
+		delay(RetryDelay2);
+	}
+
+	while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("+QIACT:") == -1);
+	{
+		if (_buffer.indexOf("+QIACT:") == -1)
+		{
+			return "0.0.0.0";
+		}
+		else
+		{
+			return midString(_buffer,"\"","\"");
 		}
 	}
 }
@@ -722,19 +741,116 @@ bool QuectelEC21module::disConnectNetwork()
 	}
 }
 
-bool QuectelEC21module::terminateHTTP()
+// bool QuectelEC21module::terminateHTTP()
+// {
+// 	int count = 0;
+// 	do
+// 	{
+// 		_Serial->print(F("AT+QHTTPSTOP\r\n"));
+
+// 		_buffer = _readSerial(200);
+// 		count++;
+// 		delay(RetryDelay);
+// 	} while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("OK") == -1);
+// 	{
+// 		if ((_buffer.indexOf("OK")) == -1)
+// 		{
+// 			return false;
+// 		}
+// 		else
+// 		{
+// 			return true;
+// 		}
+// 	}
+// }
+
+/*
+0 - application/x-www-form-urlencoded
+1 - text/plain
+2 - application/octet-stream
+3 - multipart/form-data
+4 - application/json
+5 - 5image/jpeg
+*/
+bool QuectelEC21module::httpContentType(uint8_t type)
 {
+
+	if (type > 5)
+	{
+		Serial.println("Invalid Content type");
+	}
+	else
+	{
+		int count = 0;
+		do
+		{
+			_Serial->print(F("AT+QHTTPCFG=\"contenttype\","));
+			_Serial->print(type);
+			_Serial->print(F("\r\n"));
+			_buffer = _readSerial(100);
+			count++;
+			delay(RetryDelay);
+		}
+
+		while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("OK") == -1);
+		{
+			if (_buffer.indexOf("OK") == -1)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+	}
+}
+
+bool QuectelEC21module::initateHTTP()
+{
+	uint8_t flag1;
+	uint8_t flag2;
 	int count = 0;
 	do
 	{
-		_Serial->print(F("AT+QHTTPSTOP\r\n"));
-
-		_buffer = _readSerial(200);
+		_Serial->print(F("AT+QSSLCFG=\"SNI\",1,1\r\n"));
+		_buffer = _readSerial(100);
 		count++;
 		delay(RetryDelay);
-	} while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("OK") == -1);
+	}
+
+	while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("OK") == -1);
 	{
-		if ((_buffer.indexOf("OK")) == -1)
+		if (_buffer.indexOf("OK") == -1)
+		{
+			flag1 = 0;
+		}
+		else
+		{
+			flag1 = 1;
+		}
+	}
+	count = 0;
+	do
+	{
+		_Serial->print(F("AT+QSSLCFG=\"ciphersuite\",1,0xFFFF\r\n"));
+		_buffer = _readSerial(100);
+		count++;
+		delay(RetryDelay);
+	}
+
+	while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("OK") == -1);
+	{
+		if (_buffer.indexOf("OK") == -1)
+		{
+			flag2 = 0;
+		}
+		else
+		{
+			flag2 = 1;
+		}
+	}
+	if (flag1 == 0 && flag2 == 0)
 		{
 			return false;
 		}
@@ -742,7 +858,6 @@ bool QuectelEC21module::terminateHTTP()
 		{
 			return true;
 		}
-	}
 }
 
 bool QuectelEC21module::ping(String url)
@@ -806,6 +921,32 @@ bool QuectelEC21module::deleteFile(String filename)
 	{
 		_Serial->print(F("AT+QFDEL=\""));
 		_Serial->print(filename);
+		_Serial->print(F("\"\r\n"));
+		_buffer = _readSerial(1000);
+		count++;
+		delay(RetryDelay);
+	}
+
+	while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("OK") == -1);
+	{
+		if (_buffer.indexOf("OK") == -1)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+}
+
+bool QuectelEC21module::addHeader(String name,String value)
+{
+	int count = 0;
+	do
+	{
+		_Serial->print(F("AT+QHTTPCFG=\"custom_header\",\""));
+		_Serial->print(name + ":" + value);
 		_Serial->print(F("\"\r\n"));
 		_buffer = _readSerial(1000);
 		count++;
@@ -946,18 +1087,19 @@ int QuectelEC21module::updateESP(char *md5Checksum)
 		}
 		else
 		{
-			deleteFile("temp");
+			// deleteFile("temp");
 			if (Update.end())
 			{
-				Serial.println("Flashing ... done!");
-				delay(100);
-				Serial.println("Rebooting ESP");
-				ESP.restart();
+				// Serial.println("Flashing ... done!");
+				// delay(100);
+				// Serial.println("Rebooting ESP");
+				// ESP.restart();
 				return true;
 			}
 			else
 			{
 				Serial.println("Flashing Failed");
+				return -1;
 			}
 		}
 	}
@@ -1091,35 +1233,15 @@ int QuectelEC21module::readFile(const char *filename)
 	}
 }
 
-bool QuectelEC21module::PostHTTP(const char *URL, const char *message)
+uint16_t QuectelEC21module::PostHTTP(String URL, String message, int type)
 {
+	
+	// delay(100);
 	uint8_t flag1;
 	uint8_t flag2;
-	uint8_t flag3;
-	uint8_t flag4;
 	int count = 0;
-	do
-	{
-		_Serial->print(F("AT+QHTTPCFG=\"contenttype\",1\r\n"));
-		_buffer = _readSerial(100);
-		count++;
-		delay(RetryDelay);
-	}
-
-	while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("OK") == -1);
-	{
-		if (_buffer.indexOf("OK") == -1)
-		{
-			flag1 = 0;
-		}
-		else
-		{
-			flag1 = 1;
-		}
-	}
-	// delay(100);
-
-	count = 0;
+	initateHTTP();
+	httpContentType(type);
 	do
 	{
 		delay(RetryDelay);
@@ -1134,11 +1256,11 @@ bool QuectelEC21module::PostHTTP(const char *URL, const char *message)
 	{
 		if (_buffer.indexOf("OK") == -1)
 		{
-			flag2 = 0;
+			flag1 = 0;
 		}
 		else
 		{
-			flag2 = 1;
+			flag1 = 1;
 		}
 	}
 	// delay(100);
@@ -1147,20 +1269,21 @@ bool QuectelEC21module::PostHTTP(const char *URL, const char *message)
 	do
 	{
 		_Serial->print(F("AT+QHTTPPOST="));
-		_Serial->print(strlen(message));
+		_Serial->print(message.length());
 		_Serial->print(F(",15,15"));
 		_Serial->print(F("\r\n"));
-		_buffer = _readSerial(1000);
+		_buffer = _readSerialUntill("CONNECT",5000);
+		// _buffer = _readSerial(5000);
 		count++;
 	} while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("CONNECT") == -1);
 	{
 		if (_buffer.indexOf("CONNECT") == -1)
 		{
-			flag3 = 0;
+			flag2 = 0;
 		}
 		else
 		{
-			flag3 = 1;
+			flag2 = 1;
 		}
 	}
 	// delay(100);
@@ -1170,60 +1293,31 @@ bool QuectelEC21module::PostHTTP(const char *URL, const char *message)
 	{
 		delay(RetryDelay);
 		_Serial->print(message + String("\r\n"));
-		_buffer = _readSerial(100);
+		_buffer = _readSerialUntill("+QHTTPPOST:",5000);
+		// _buffer = _readSerial(5000);
 		count++;
 
-	} while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("200") == -1);
+	} while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("+QHTTPPOST:") == -1);
 	{
-		if (_buffer.indexOf("200") == -1)
+		if (_buffer.indexOf("+QHTTPPOST:") == -1)
 		{
-			flag4 = 0;
+			return 404;
 		}
 		else
 		{
-			flag4 = 1;
-		}
-		if (flag1 == 1 && flag2 == 1 && flag3 == 1 && flag4 == 1)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
+			String response = midString(_buffer,",",",");
+			return (uint16_t)response.toInt();
 		}
 	}
 	// delay(100);
 }
 
-bool QuectelEC21module::GetHTTP(const char *URL, const char *message)
+uint16_t QuectelEC21module::GetHTTP(String URL)
 {
 	uint8_t flag1;
-	uint8_t flag2;
-	uint8_t flag3;
-	uint8_t flag4;
 	int count = 0;
-	do
-	{
-		_Serial->print(F("AT+QHTTPCFG=\"contenttype\",1\r\n"));
-		_buffer = _readSerial(100);
-		count++;
-		delay(RetryDelay);
-	}
-
-	while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("OK") == -1);
-	{
-		if (_buffer.indexOf("OK") == -1)
-		{
-			flag1 = 0;
-		}
-		else
-		{
-			flag1 = 1;
-		}
-	}
+	initateHTTP();
 	// delay(100);
-
-	count = 0;
 	do
 	{
 		delay(RetryDelay);
@@ -1238,94 +1332,46 @@ bool QuectelEC21module::GetHTTP(const char *URL, const char *message)
 	{
 		if (_buffer.indexOf("OK") == -1)
 		{
-			flag2 = 0;
+			flag1 = 0;
 		}
 		else
 		{
-			flag2 = 1;
+			flag1 = 1;
 		}
 	}
-	// delay(100);
 	count = 0;
 
 	do
 	{
-		_Serial->print(F("AT+QHTTPGET="));
-		// _Serial->print(strlen(message));
-		_Serial->print(F("80"));
-		_Serial->print(F("\r\n"));
-		_buffer = _readSerial(1000);
+		_Serial->print(F("AT+QHTTPGET=80\r\n"));
+		_buffer = _readSerialUntill("+QHTTPGET:",5000);
+		// _buffer = _readSerial(1000);
 		count++;
-	} while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("CONNECT") == -1);
+	} while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("+QHTTPGET:") == -1);
 	{
-		if (_buffer.indexOf("CONNECT") == -1)
+		if (_buffer.indexOf("+QHTTPGET:") == -1)
 		{
-			flag3 = 0;
+			return 404;
 		}
 		else
 		{
-			flag3 = 1;
+			String response = midString(_buffer,",",",");
+			return (uint16_t)response.toInt();
 		}
-	}
-	// delay(100);
-	count = 0;
-
-	do
-	{
-		delay(RetryDelay);
-		_Serial->print(message + String("\r\n"));
-		_buffer = _readSerial(100);
-		count++;
-
-	} while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("200") == -1);
-	{
-		if (_buffer.indexOf("200") == -1)
-		{
-			flag4 = 0;
-		}
-		else
-		{
-			flag4 = 1;
-		}
-		if (flag1 == 1 && flag2 == 1 && flag3 == 1 && flag4 == 1)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		
 	}
 	// delay(100);
 }
 
-bool QuectelEC21module::downloadUpdate(const char *URL, char *md5Checksum)
+int QuectelEC21module::downloadUpdate(const char *URL, char *md5Checksum)
 {
 	uint8_t flag1;
 	uint8_t flag2;
 	uint8_t flag3;
-	uint8_t flag4;
 	size_t size = 0;
 	int count = 0;
-	do
-	{
-		_Serial->print(F("AT+QHTTPCFG=\"contenttype\",2\r\n"));
-		_buffer = _readSerial(100);
-		count++;
-		delay(RetryDelay);
-	}
-
-	while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("OK") == -1);
-	{
-		if (_buffer.indexOf("OK") == -1)
-		{
-			flag1 = 0;
-		}
-		else
-		{
-			flag1 = 1;
-		}
-	}
+	initateHTTP();
+	// httpContentType(2);
 	// delay(100);
 
 	count = 0;
@@ -1343,11 +1389,11 @@ bool QuectelEC21module::downloadUpdate(const char *URL, char *md5Checksum)
 	{
 		if (_buffer.indexOf("OK") == -1)
 		{
-			flag2 = 0;
+			flag1 = 0;
 		}
 		else
 		{
-			flag2 = 1;
+			flag1 = 1;
 		}
 	}
 	// delay(100);
@@ -1366,13 +1412,14 @@ bool QuectelEC21module::downloadUpdate(const char *URL, char *md5Checksum)
 	{
 		if (_buffer.indexOf("200") == -1)
 		{
-			flag3 = 0;
+			flag2 = 0;
 		}
 		else
 		{
-			flag3 = 1;
+			flag2 = 1;
 		}
 	}
+	count = 0;
 	do
 	{
 		_Serial->print(F("AT+QHTTPREADFILE=\"temp\",300\r\n"));
@@ -1382,17 +1429,19 @@ bool QuectelEC21module::downloadUpdate(const char *URL, char *md5Checksum)
 	{
 		if (_buffer.indexOf("+QHTTPREADFILE: 0\r\n") == -1)
 		{
-			flag4 = 0;
+			flag3 = 0;
 		}
 		else
 		{
-			flag4 = 1;
-			updateESP(md5Checksum);
+			flag3 = 1;
+			if(updateESP(md5Checksum) == -1){
+				flag3 = -1;
+			}
 		}
 	}
 	// delay(100);
 
-	if (flag1 == 1 && flag2 == 1 && flag3 == 1 && flag4 == 1)
+	if (flag1 == 1 && flag2 == 1 && flag3 == 1)
 	{
 		return true;
 	}
@@ -1407,29 +1456,10 @@ bool QuectelEC21module::downloadFile(const char *URL, const char *filename)
 	uint8_t flag1;
 	uint8_t flag2;
 	uint8_t flag3;
-	uint8_t flag4;
 	size_t size = 0;
 	int count = 0;
-	do
-	{
-		_Serial->print(F("AT+QHTTPCFG=\"contenttype\",2\r\n"));
-		_buffer = _readSerial(100);
-		count++;
-		delay(RetryDelay);
-	}
-
-	while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("OK") == -1);
-	{
-		if (_buffer.indexOf("OK") == -1)
-		{
-			flag1 = 0;
-		}
-		else
-		{
-			flag1 = 1;
-		}
-	}
-	// delay(100);
+	initateHTTP();
+	httpContentType(2);
 
 	count = 0;
 	do
@@ -1446,11 +1476,11 @@ bool QuectelEC21module::downloadFile(const char *URL, const char *filename)
 	{
 		if (_buffer.indexOf("OK") == -1)
 		{
-			flag2 = 0;
+			flag1 = 0;
 		}
 		else
 		{
-			flag2 = 1;
+			flag1 = 1;
 		}
 	}
 	// delay(100);
@@ -1469,13 +1499,14 @@ bool QuectelEC21module::downloadFile(const char *URL, const char *filename)
 	{
 		if (_buffer.indexOf("200") == -1)
 		{
-			flag3 = 0;
+			flag2 = 0;
 		}
 		else
 		{
-			flag3 = 1;
+			flag2 = 1;
 		}
 	}
+	count = 0;
 	do
 	{
 		_Serial->print(F("AT+QHTTPREADFILE=\"temp\",300\r\n"));
@@ -1485,17 +1516,17 @@ bool QuectelEC21module::downloadFile(const char *URL, const char *filename)
 	{
 		if (_buffer.indexOf("+QHTTPREADFILE: 0\r\n") == -1)
 		{
-			flag4 = 0;
+			flag3 = 0;
 		}
 		else
 		{
-			flag4 = 1;
+			flag3 = 1;
 			readFile(filename);
 		}
 	}
 	// delay(100);
 
-	if (flag1 == 1 && flag2 == 1 && flag3 == 1 && flag4 == 1)
+	if (flag1 == 1 && flag2 == 1 && flag3 == 1)
 	{
 		return true;
 	}
@@ -1505,34 +1536,13 @@ bool QuectelEC21module::downloadFile(const char *URL, const char *filename)
 	}
 }
 
-bool QuectelEC21module::PutHTTP(const char *URL, const char *message)
+uint16_t QuectelEC21module::PutHTTP(String URL, String message, int type)
 {
 	uint8_t flag1;
 	uint8_t flag2;
-	uint8_t flag3;
-	uint8_t flag4;
 	int count = 0;
-	do
-	{
-		_Serial->print(F("AT+QHTTPCFG=\"contenttype\",1\r\n"));
-		_buffer = _readSerial(100);
-		count++;
-		delay(RetryDelay);
-	}
-
-	while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("OK") == -1);
-	{
-		if (_buffer.indexOf("OK") == -1)
-		{
-			flag1 = 0;
-		}
-		else
-		{
-			flag1 = 1;
-		}
-	}
-	// delay(100);
-
+	initateHTTP();
+	httpContentType(type);
 	count = 0;
 	do
 	{
@@ -1548,6 +1558,28 @@ bool QuectelEC21module::PutHTTP(const char *URL, const char *message)
 	{
 		if (_buffer.indexOf("OK") == -1)
 		{
+			flag1 = 0;
+		}
+		else
+		{
+			flag1 = 1;
+		}
+	}
+	// delay(100);
+	count = 0;
+
+	do
+	{
+		_Serial->print(F("AT+QHTTPPUT="));
+		_Serial->print(message.length());
+		_Serial->print(F(",15,15"));
+		_Serial->print(F("\r\n"));
+		_buffer = _readSerial(1000);
+		count++;
+	} while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("CONNECT") == -1);
+	{
+		if (_buffer.indexOf("CONNECT") == -1)
+		{
 			flag2 = 0;
 		}
 		else
@@ -1560,50 +1592,21 @@ bool QuectelEC21module::PutHTTP(const char *URL, const char *message)
 
 	do
 	{
-		_Serial->print(F("AT+QHTTPPUT="));
-		_Serial->print(strlen(message));
-		_Serial->print(F(",15,15"));
-		_Serial->print(F("\r\n"));
-		_buffer = _readSerial(1000);
-		count++;
-	} while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("CONNECT") == -1);
-	{
-		if (_buffer.indexOf("CONNECT") == -1)
-		{
-			flag3 = 0;
-		}
-		else
-		{
-			flag3 = 1;
-		}
-	}
-	// delay(100);
-	count = 0;
-
-	do
-	{
 		delay(RetryDelay);
 		_Serial->print(message + String("\r\n"));
-		_buffer = _readSerial(100);
+		_buffer = _readSerialUntill("+QHTTPPUT:",3000);
 		count++;
 
-	} while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("200") == -1);
+	} while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("+QHTTPPUT:") == -1);
 	{
-		if (_buffer.indexOf("200") == -1)
+		if (_buffer.indexOf("+QHTTPPUT:") == -1)
 		{
-			flag4 = 0;
+			return 404;
 		}
 		else
 		{
-			flag4 = 1;
-		}
-		if (flag1 == 1 && flag2 == 1 && flag3 == 1 && flag4 == 1)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
+			String response = midString(_buffer,",",",");
+			return (uint16_t)response.toInt();
 		}
 	}
 	// delay(100);
@@ -1692,6 +1695,7 @@ String QuectelEC21module::_readSerialUntill(String buff, uint32_t timeout)
 {
 	uint64_t timeOld = millis();
 	String str = "";
+	Serial.print("\r\n");
 	while (_Serial->available() > 0 || !(millis() > timeOld + timeout))
 	{
 		Serial.print(".");
@@ -1707,6 +1711,7 @@ String QuectelEC21module::_readSerialUntill(String buff, uint32_t timeout)
 	#if ENABLE_DEBUG
 		Serial.println(str);
 	#endif
+	Serial.print("\r\n");
 	return str;
 }
 
@@ -1911,3 +1916,5 @@ int QuectelEC21module::numberOfDigits(uint16_t n)
 	}
 	return count;
 }
+
+QuectelEC21module EC21module;

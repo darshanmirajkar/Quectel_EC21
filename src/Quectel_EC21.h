@@ -62,20 +62,22 @@ public:
   void initilizeModule();
   bool configureModule();
   bool checkforNetwork();
-  bool initHTTP();
-  bool terminateHTTP();
+  bool initateHTTP();
   bool Restart();
   bool hardRestart();
-  bool PostHTTP(const char *URL, const char *message);
-  bool GetHTTP(const char *URL, const char *message);
-  bool PutHTTP(const char *URL, const char *message);
+  bool httpContentType(uint8_t type);
+  uint16_t PostHTTP(String URL, String message, int type);
+  uint16_t GetHTTP(String URL);
+  uint16_t PutHTTP(String URL, String message, int type);
+  bool addHeader(String name, String value);
   String HTTPread();
   bool setAPN(const char *apn);
   bool connectNetwork();
   bool disConnectNetwork();
+  String getIPAddress();
   bool ping(String url);
-  bool downloadFile(const char *URL, const char *md5Checksum);
-  bool downloadUpdate(const char *URL, char *filename);
+  bool downloadFile(const char *URL, const char *filename);
+  int downloadUpdate(const char *URL, char *md5Checksum);
   String SerialRead();
   void Retry(uint16_t NumofRetrys, uint16_t RetryDelays);
 
@@ -101,5 +103,6 @@ public:
 
   String getMD5checksum(const char *path);
 };
-
+extern QuectelEC21module EC21module;
 #endif
+
