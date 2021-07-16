@@ -632,10 +632,10 @@ bool QuectelEC21module::simPresence()
 
 void QuectelEC21module::getModuleInfo()
 {
-	String manufacturarer = getManufacturer();
-	String model = getModelNumber();
-	String imei = getIMEI();
-	String serialNumber = getSerialNumber();
+	manufacturarer = getManufacturer();
+	model = getModelNumber();
+	imei = getIMEI();
+	serialNumber = getSerialNumber();
 	Serial.println("Manufacturer : " + manufacturarer);
 	Serial.println("Model        : " + model);
 	Serial.println("IMEI         : " + imei);
@@ -647,11 +647,11 @@ void QuectelEC21module::getSimInfo()
 	if (simPresence())
 	{
 		Serial.println("SIM CARD FOUND");
-		String operater = getOperater();
-		String techonology = getNetworkType();
-		String band = getBandInfo();
-		int rssi = getRssi();
-		String simNum = getSimNumber();
+		operater = getOperater();
+		techonology = getNetworkType();
+		band = getBandInfo();
+		rssi = getRssi();
+		simNum = getSimNumber();
 		
 		Serial.println("Operater   : " + operater);
 		Serial.println("Technology : " + techonology);
@@ -1918,3 +1918,4 @@ int QuectelEC21module::numberOfDigits(uint16_t n)
 }
 
 QuectelEC21module EC21module;
+

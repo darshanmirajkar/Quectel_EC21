@@ -92,6 +92,11 @@ public:
   String getModelNumber();
   void getModuleInfo();
 
+  String manufacturarer;
+	String model;
+	String imei;
+	String serialNumber;
+
   /**SIM Info**/
   String getSimNumber();
   bool simPresence();
@@ -101,8 +106,15 @@ public:
   String getBandInfo();
   void getSimInfo();
 
+  String operater;
+  String techonology;
+  String band;
+  int rssi;
+  String simNum;
+
   String getMD5checksum(const char *path);
 };
 extern QuectelEC21module EC21module;
 #endif
+
 
