@@ -27,7 +27,6 @@ class QuectelEC21module
 private:
   int NumofRetry = 3;
   // int NumofCustonRetry[5] = {1,2,3,4,5};
-  const char* operaterAPN = "airtelgprs.com";
   int RetryDelay = 50; //in ms
   int RetryDelay2 = 0; //in ms
   int MAX_Count = 10;
@@ -49,6 +48,7 @@ private:
 
 public:
   QuectelEC21module();
+  const char* operaterAPN = "airtelgprs.com";
   int _timeout;
   bool initilize = false;
   void SelectSerial(HardwareSerial *theSerial);
