@@ -76,6 +76,7 @@ public:
   bool connectNetwork();
   bool disConnectNetwork();
   String getIPAddress();
+  bool getCurrentTime(String url);
   bool ping(String url);
   bool downloadFile(const char *URL, const char *filename);
   int downloadUpdate(const char *URL, char *md5Checksum);
@@ -117,6 +118,7 @@ public:
 };
 extern QuectelEC21module EC21module;
 #endif
+
 
 
 

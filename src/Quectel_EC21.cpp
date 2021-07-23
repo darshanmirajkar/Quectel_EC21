@@ -665,6 +665,40 @@ void QuectelEC21module::getSimInfo()
 	}
 }
 
+bool QuectelEC21module::getCurrentTime(String url)
+{
+	
+	int count = 0;
+	do
+	{
+		_Serial->print(F("AT+QNTP=1,\""));
+		_Serial->print(url);
+		_Serial->print("\"\r\n");
+		_buffer = _readSerial(10);
+		count++;
+		delay(RetryDelay2);
+	}
+
+	while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("+QNTP:") == -1);
+	{
+		if (_buffer.indexOf("+QNTP:") == -1)
+		{
+			String utcTime = "2020-10-10T09:14:30+00:00";
+			return utcTime;
+		}
+		else
+		{
+			String fullTime  = midString(_buffer,"+QNTP: 0,\"","\"");
+			fullTime.replace("/","-");
+			fullTime.replace(",","T");
+			Serial.println(fullTime);
+			return fullTime;
+		}
+	}
+	
+}
+
+
 bool QuectelEC21module::connectNetwork()
 {
 	int count = 0;
@@ -1918,5 +1952,6 @@ int QuectelEC21module::numberOfDigits(uint16_t n)
 }
 
 QuectelEC21module EC21module;
+
 
 
