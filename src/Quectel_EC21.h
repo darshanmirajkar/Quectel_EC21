@@ -28,7 +28,7 @@ private:
   int NumofRetry = 3;
   // int NumofCustonRetry[5] = {1,2,3,4,5};
   int RetryDelay = 50; //in ms
-  int RetryDelay2 = 0; //in ms
+  int RetryDelay2 = 1; //in ms
   int MAX_Count = 10;
   uint32_t _baud;
   String _buffer;
@@ -59,6 +59,7 @@ public:
   void basicSetup();
   bool SetAT();
   bool enableECHO();
+  void enable();
   void initilizeModule();
   bool configureModule();
   bool checkforNetwork();
@@ -116,5 +117,6 @@ public:
 };
 extern QuectelEC21module EC21module;
 #endif
+
 
 

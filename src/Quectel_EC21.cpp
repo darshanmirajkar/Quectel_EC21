@@ -10,6 +10,12 @@ void QuectelEC21module::SelectSerial(HardwareSerial *theSerial)
 	_Serial = theSerial;
 }
 
+void QuectelEC21module::enable()
+{
+	pinMode(EC21_RESET, OUTPUT);
+	digitalWrite(EC21_RESET, HIGH);
+}
+
 bool QuectelEC21module::hardRestart()
 {
 	digitalWrite(EC21_RESET, LOW);
@@ -19,8 +25,6 @@ bool QuectelEC21module::hardRestart()
 
 void QuectelEC21module::begin()
 {
-	pinMode(EC21_RESET, OUTPUT);
-	digitalWrite(EC21_RESET, HIGH);
 	_baud = DEFAULT_BAUD_RATE; // Default baud rate 115200
 	_Serial->begin(_baud);
 	_buffer.reserve(BUFFER_RESERVE_MEMORY);
@@ -34,8 +38,6 @@ void QuectelEC21module::Retry(uint16_t NumofRetrys, uint16_t RetryDelays)
 
 void QuectelEC21module::begin(uint32_t baud)
 {
-	pinMode(EC21_RESET, OUTPUT);
-	digitalWrite(EC21_RESET, HIGH);
 	_baud = baud;
 	_Serial->begin(_baud);
 	_buffer.reserve(BUFFER_RESERVE_MEMORY);
@@ -43,8 +45,6 @@ void QuectelEC21module::begin(uint32_t baud)
 
 void QuectelEC21module::begin(uint32_t baud, uint32_t config, int8_t rxPin, int8_t txPin)
 {
-	pinMode(EC21_RESET, OUTPUT);
-	digitalWrite(EC21_RESET, HIGH);
 	_baud = baud;
 	_Serial->begin(_baud, config, rxPin, txPin);
 	_buffer.reserve(BUFFER_RESERVE_MEMORY);
@@ -267,7 +267,7 @@ bool QuectelEC21module::configureModule()
 		{
 			flag4 = 1;
 		}
-		if (flag1 == 0 && flag2 == 0 && flag3 == 0 && flag4 == 0)
+		if (flag1 == 0 || flag2 == 0 || flag3 == 0 || flag4 == 0)
 		{
 			return false;
 		}
@@ -850,7 +850,7 @@ bool QuectelEC21module::initateHTTP()
 			flag2 = 1;
 		}
 	}
-	if (flag1 == 0 && flag2 == 0)
+	if (flag1 == 0 || flag2 == 0)
 		{
 			return false;
 		}
@@ -1441,7 +1441,7 @@ int QuectelEC21module::downloadUpdate(const char *URL, char *md5Checksum)
 	}
 	// delay(100);
 
-	if (flag1 == 1 && flag2 == 1 && flag3 == 1)
+	if (flag1 == 1 || flag2 == 1 || flag3 == 1)
 	{
 		return true;
 	}
@@ -1526,7 +1526,7 @@ bool QuectelEC21module::downloadFile(const char *URL, const char *filename)
 	}
 	// delay(100);
 
-	if (flag1 == 1 && flag2 == 1 && flag3 == 1)
+	if (flag1 == 1 || flag2 == 1 || flag3 == 1)
 	{
 		return true;
 	}
@@ -1918,4 +1918,5 @@ int QuectelEC21module::numberOfDigits(uint16_t n)
 }
 
 QuectelEC21module EC21module;
+
 
