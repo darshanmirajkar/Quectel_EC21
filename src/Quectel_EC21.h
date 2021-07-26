@@ -60,6 +60,7 @@ public:
   bool SetAT();
   bool enableECHO();
   void enable();
+  void disable();
   void initilizeModule();
   bool configureModule();
   bool checkforNetwork();
@@ -118,6 +119,7 @@ public:
 };
 extern QuectelEC21module EC21module;
 #endif
+
 
 
 

@@ -16,6 +16,12 @@ void QuectelEC21module::enable()
 	digitalWrite(EC21_RESET, HIGH);
 }
 
+void QuectelEC21module::disable()
+{
+	pinMode(EC21_RESET, OUTPUT);
+	digitalWrite(EC21_RESET, LOW);
+}
+
 bool QuectelEC21module::hardRestart()
 {
 	digitalWrite(EC21_RESET, LOW);
@@ -1952,6 +1958,7 @@ int QuectelEC21module::numberOfDigits(uint16_t n)
 }
 
 QuectelEC21module EC21module;
+
 
 
 
