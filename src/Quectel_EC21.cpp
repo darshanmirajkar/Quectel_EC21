@@ -62,42 +62,47 @@ void QuectelEC21module::setup()
 	SelectSerial(LTE_SERIAL_PORT); //Select the serial port
 	begin(115200, SERIAL_8N1, LTE_RX_PIN, LTE_TX_PIN);
 	initilizeModule();
-	Serial.println("Searching For network..");
-	if (checkforNetwork())
-	{
-		Serial.println("Network Found");
-	}
-	else
-	{
-		Serial.print(".");
-	}
+	if (initilize)
+	{	
+		Serial.println("Searching For network..");
+		if (checkforNetwork())
+		{
+			Serial.println("Network Found");
+		}
+		else
+		{
+			Serial.print(".");
+		}
 
-	if (enableECHO())
-	{
-		#if ENABLE_DEBUG
-		Serial.println("Echo Enabled");
-		#endif
-	}
+		if (enableECHO())
+		{
+#if ENABLE_DEBUG
+			Serial.println("Echo Enabled");
+#endif
+		}
 
-	if (disConnectNetwork())
-	{
-		#if ENABLE_DEBUG
-		Serial.println("Disconnected to internet");
-		#endif
-	}
+		if (disConnectNetwork())
+		{
+#if ENABLE_DEBUG
+			Serial.println("Disconnected to internet");
+#endif
+		}
 
-	if (setAPN(operaterAPN))
-	{
-		#if ENABLE_DEBUG
-		Serial.println("Set Operater APN");
-		#endif
-	}
+		if (setAPN(operaterAPN))
+		{
+#if ENABLE_DEBUG
+			Serial.println("Set Operater APN");
+#endif
+		}
 
-	if (connectNetwork())
-	{
-		Serial.println("Connected to Internet");
-	}else{
-		Serial.println("Failed to connect Internet");
+		if (connectNetwork())
+		{
+			Serial.println("Connected to Internet");
+		}
+		else
+		{
+			Serial.println("Failed to connect Internet");
+		}
 	}
 }
 
@@ -107,21 +112,23 @@ void QuectelEC21module::basicSetup()
 	begin(115200, SERIAL_8N1, LTE_RX_PIN, LTE_TX_PIN);
 	initilizeModule();
 	Serial.println("Searching For network..");
-	if (checkforNetwork())
+	if (initilize)
 	{
-		Serial.println("Network Found");
+		if (checkforNetwork())
+		{
+			Serial.println("Network Found");
+		}
+		else
+		{
+			Serial.print(".");
+		}
+		if (enableECHO())
+		{
+#if ENABLE_DEBUG
+			Serial.println("Echo Enabled");
+#endif
+		}
 	}
-	else
-	{
-		Serial.print(".");
-	}
-	if (enableECHO())
-	{
-		#if ENABLE_DEBUG
-		Serial.println("Echo Enabled");
-		#endif
-	}
-
 }
 
 bool QuectelEC21module::SetAT()
@@ -130,13 +137,12 @@ bool QuectelEC21module::SetAT()
 	do
 	{
 		_Serial->print(F("AT\r\n"));
-
 		_buffer = _readSerial(20);
-		// count++;
+		count++;
 		delay(RetryDelay);
-	} while (/*(count < NumofRetry && count < MAX_Count) && */_buffer.indexOf("OK") == -1);
+	} while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("OK") == -1);
 	{
-		if ((_buffer.indexOf("OK")) == -1)
+		if (_buffer.indexOf("OK") == -1)
 		{
 			Serial.print(".");
 			return false;
@@ -179,7 +185,8 @@ void QuectelEC21module::initilizeModule(){
 		Serial.println("SPIFFS Mount Failed");
 	}
 	uint64_t timeOld = millis();
-	while (!SetAT() || !(millis() > timeOld + SET_AT_TIMEOUT));
+	while (!SetAT() && (millis() > timeOld + SET_AT_TIMEOUT));
+	
 	if(configureModule()){
 		Serial.println("Configuration Successfull");
 	}else{
@@ -292,24 +299,23 @@ bool QuectelEC21module::checkforNetwork()
 		_Serial->print(F("AT+COPS?\r\n"));
 		_buffer = _readSerial(20);
 		count++;
-		delay(1000);
-		if (count > 45)
+		delay(500);
+		if (count > 25)
 		{
 			Serial.println("\nNetwork Not Found");
 			return false;
 			// setLTE();
-			// hardRestart();
+			// hardRestart();w
 			// delay(10000);
 			// ESP.restart();
 		}
 	}
 
-	while ((count < 50) && _buffer.indexOf("\"") == -1);
+	while ((count < 30) && _buffer.indexOf("\"") == -1);
 	{
 		if (_buffer.indexOf("\"") == -1)
 		{
 			return false;
-			;
 		}
 		else
 		{
