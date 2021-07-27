@@ -185,7 +185,7 @@ void QuectelEC21module::initilizeModule(){
 		Serial.println("SPIFFS Mount Failed");
 	}
 	uint64_t timeOld = millis();
-	while (!SetAT() && (millis() > timeOld + SET_AT_TIMEOUT));
+	while (!SetAT() && (millis() < timeOld + SET_AT_TIMEOUT));
 	
 	if(configureModule()){
 		Serial.println("Configuration Successfull");
