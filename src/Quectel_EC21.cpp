@@ -179,7 +179,7 @@ void QuectelEC21module::initilizeModule(){
 		Serial.println("SPIFFS Mount Failed");
 	}
 	uint64_t timeOld = millis();
-	while (!SetAT() && !(millis() > timeOld + SET_AT_TIMEOUT));
+	while (!SetAT() || !(millis() > timeOld + SET_AT_TIMEOUT));
 	if(configureModule()){
 		Serial.println("Configuration Successfull");
 	}else{
@@ -1958,6 +1958,7 @@ int QuectelEC21module::numberOfDigits(uint16_t n)
 }
 
 QuectelEC21module EC21module;
+
 
 
 
