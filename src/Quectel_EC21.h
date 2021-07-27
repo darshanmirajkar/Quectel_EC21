@@ -12,7 +12,7 @@
 #define DEFAULT_BAUD_RATE 115200
 #define TIME_OUT_READ_SERIAL 8000
 #define DOWNLOAD_CHUNK_SIZE 10240
-#define SET_AT_TIMEOUT 10000 //in ms
+#define SET_AT_TIMEOUT 20000 //in ms
 #define ENABLE_DEBUG 0  // 0 - Disable, 1 - level1 , 2 - level2
 
 #define EC21_RESET 12

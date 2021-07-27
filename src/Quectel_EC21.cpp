@@ -299,7 +299,7 @@ bool QuectelEC21module::checkforNetwork()
 		_Serial->print(F("AT+COPS?\r\n"));
 		_buffer = _readSerial(20);
 		count++;
-		delay(1000);
+		delay(500);
 		if (count > 25)
 		{
 			Serial.println("\nNetwork Not Found");
