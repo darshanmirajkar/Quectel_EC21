@@ -49,6 +49,10 @@ private:
 public:
   QuectelEC21module();
   const char* operaterAPN = "airtelgprs.com";
+  const char* operaterUsername = "";
+  const char* operaterPassword = "";
+  uint8_t operaterAuth = 3;
+  const char* operaterPUK = "";
   int _timeout;
   bool initilize = false;
   void SelectSerial(HardwareSerial *theSerial);
@@ -73,7 +77,7 @@ public:
   uint16_t PutHTTP(String URL, String message, int type);
   bool addHeader(String name, String value);
   String HTTPread();
-  bool setAPN(const char *apn);
+  bool setAPN(const char *apn, const char* username, const char *password, int auth);
   bool connectNetwork();
   bool disConnectNetwork();
   String getIPAddress();
@@ -119,6 +123,7 @@ public:
 };
 extern QuectelEC21module EC21module;
 #endif
+
 
 
 

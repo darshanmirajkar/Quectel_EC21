@@ -88,7 +88,7 @@ void QuectelEC21module::setup()
 #endif
 		}
 
-		if (setAPN(operaterAPN))
+		if (setAPN(operaterAPN,operaterUsername,operaterPassword,operaterAuth))
 		{
 #if ENABLE_DEBUG
 			Serial.println("Set Operater APN");
@@ -453,14 +453,20 @@ String QuectelEC21module::getBandInfo()
 	}
 }
 
-bool QuectelEC21module::setAPN(const char *apn)
+bool QuectelEC21module::setAPN(const char *apn, const char* username, const char *password, int auth)
 {
 	int count = 0;
 	do
 	{
 		_Serial->print(F("AT+QICSGP=1,1,\""));
 		_Serial->print(apn);
-		_Serial->print(F("\",\"\",\"\",1\r\n"));
+		_Serial->print(F("\",\""));
+		_Serial->print(username);
+		_Serial->print(F("\",\""));
+		_Serial->print(password);
+		_Serial->print(F("\","));
+		_Serial->print(auth);
+		_Serial->print(F("\r\n"));
 		_buffer = _readSerial(10);
 		count++;
 		delay(RetryDelay2);
@@ -1964,6 +1970,7 @@ int QuectelEC21module::numberOfDigits(uint16_t n)
 }
 
 QuectelEC21module EC21module;
+
 
 
 
