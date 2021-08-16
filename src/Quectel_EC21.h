@@ -28,7 +28,7 @@ private:
   int NumofRetry = 3;
   // int NumofCustonRetry[5] = {1,2,3,4,5};
   int RetryDelay = 50; //in ms
-  int RetryDelay2 = 1; //in ms
+  int RetryDelay2 = 100; //in ms
   int MAX_Count = 10;
   uint32_t _baud;
   String _buffer;
@@ -72,6 +72,7 @@ public:
   bool Restart();
   bool hardRestart();
   bool httpContentType(uint8_t type);
+  void configureNetwork();
   uint16_t PostHTTP(String URL, String message, int type);
   uint16_t GetHTTP(String URL);
   uint16_t PutHTTP(String URL, String message, int type);
@@ -123,6 +124,7 @@ public:
 };
 extern QuectelEC21module EC21module;
 #endif
+
 
 
 

@@ -88,7 +88,26 @@ void QuectelEC21module::setup()
 #endif
 		}
 
-		if (setAPN(operaterAPN,operaterUsername,operaterPassword,operaterAuth))
+// 		if (setAPN(operaterAPN,operaterUsername,operaterPassword,operaterAuth))
+// 		{
+// #if ENABLE_DEBUG
+// 			Serial.println("Set Operater APN");
+// #endif
+// 		}
+
+		// if (connectNetwork())
+		// {
+		// 	Serial.println("Connected to Internet");
+		// }
+		// else
+		// {
+		// 	Serial.println("Failed to connect Internet");
+		// }
+	}
+}
+
+void QuectelEC21module::configureNetwork(){
+			if (setAPN(operaterAPN,operaterUsername,operaterPassword,operaterAuth))
 		{
 #if ENABLE_DEBUG
 			Serial.println("Set Operater APN");
@@ -103,7 +122,6 @@ void QuectelEC21module::setup()
 		{
 			Serial.println("Failed to connect Internet");
 		}
-	}
 }
 
 void QuectelEC21module::basicSetup()
@@ -1970,6 +1988,7 @@ int QuectelEC21module::numberOfDigits(uint16_t n)
 }
 
 QuectelEC21module EC21module;
+
 
 
 
