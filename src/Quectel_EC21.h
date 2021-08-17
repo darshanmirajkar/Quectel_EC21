@@ -13,6 +13,7 @@
 #define TIME_OUT_READ_SERIAL 8000
 #define DOWNLOAD_CHUNK_SIZE 10240
 #define SET_AT_TIMEOUT 20000 //in ms
+#define SET_AT_RESP_TIMEOUT 2000 //in ms
 #define ENABLE_DEBUG 0  // 0 - Disable, 1 - level1 , 2 - level2
 
 #define EC21_RESET 12
@@ -27,8 +28,8 @@ class QuectelEC21module
 private:
   int NumofRetry = 3;
   // int NumofCustonRetry[5] = {1,2,3,4,5};
-  int RetryDelay = 50; //in ms
-  int RetryDelay2 = 100; //in ms
+  int RetryDelay = 500; //in ms
+  int RetryDelay2 = 500; //in ms
   int MAX_Count = 10;
   uint32_t _baud;
   String _buffer;
@@ -124,6 +125,7 @@ public:
 };
 extern QuectelEC21module EC21module;
 #endif
+
 
 
 
