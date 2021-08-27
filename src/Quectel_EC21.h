@@ -52,7 +52,7 @@ public:
   const char* operaterAPN = "airtelgprs.com";
   const char* operaterUsername = "";
   const char* operaterPassword = "";
-  uint8_t operaterAuth = 3;
+  uint8_t operaterAuth = 0;
   const char* operaterPUK = "";
   int _timeout;
   bool initilize = false;
