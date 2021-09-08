@@ -51,8 +51,8 @@ public:
   QuectelEC21module();
   bool operatorApnAddressMode = true;
   const char* operaterAPN = "airtelgprs.com";
-  const char* operaterUsername = "";
-  const char* operaterPassword = "";
+  const char* operaterUsername = "test";
+  const char* operaterPassword = "password";
   uint8_t operaterAuth = 3;
   const char* operaterPUK = "";
   int _timeout;
