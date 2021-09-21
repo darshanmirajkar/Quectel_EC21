@@ -742,7 +742,7 @@ void QuectelEC21module::getSimInfo()
 	}
 }
 
-bool QuectelEC21module::getCurrentTime(String url)
+String QuectelEC21module::getCurrentTime(String url)
 {
 	
 	int count = 0;
