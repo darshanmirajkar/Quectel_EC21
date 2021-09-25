@@ -60,6 +60,7 @@ void QuectelEC21module::begin(uint32_t baud, uint32_t config, int8_t rxPin, int8
 void QuectelEC21module::setup()
 {
 	SelectSerial(LTE_SERIAL_PORT); //Select the serial port
+	delay(500);
 	begin(115200, SERIAL_8N1, LTE_RX_PIN, LTE_TX_PIN);
 	initilizeModule();
 	if (initilize)
@@ -106,7 +107,7 @@ void QuectelEC21module::setup()
 	}
 }
 
-void QuectelEC21module::configureNetwork(){
+bool QuectelEC21module::configureNetwork(){
 			if (setAPN(operaterAPN,operaterUsername,operaterPassword,operaterAuth))
 		{
 #if ENABLE_DEBUG
@@ -117,10 +118,12 @@ void QuectelEC21module::configureNetwork(){
 		if (connectNetwork())
 		{
 			Serial.println("Connected to Internet");
+			return true;
 		}
 		else
 		{
 			Serial.println("Failed to connect Internet");
+			return false;
 		}
 }
 
@@ -170,6 +173,7 @@ bool QuectelEC21module::SetAT()
 		{
 			Serial.println("AT command Success");
 			initilize = true;
+			Serial.println("GSM init main: "+String(initilize));
 			return true;
 		}
 	}
@@ -205,7 +209,7 @@ void QuectelEC21module::initilizeModule(){
 		Serial.println("SPIFFS Mount Failed");
 	}
 	uint64_t timeOld = millis();
-	while (!SetAT() && (millis() < timeOld + SET_AT_TIMEOUT));
+	while ((millis() < timeOld + SET_AT_TIMEOUT) && !SetAT());
 	
 	if(configureModule()){
 		Serial.println("Configuration Successfull");
@@ -289,7 +293,7 @@ bool QuectelEC21module::configureModule()
 	do
 	{
 		_Serial->print(F("AT+CFUN=0\r\n"));
-		_buffer = _readSerial(2000);
+		_buffer = _readSerial(200);
 		count++;
 		delay(RetryDelay);
 	}
@@ -311,7 +315,7 @@ bool QuectelEC21module::configureModule()
 	do
 	{
 		_Serial->print(F("AT+CFUN=1\r\n"));
-		_buffer = _readSerialUntill("OK", 5000);
+		_buffer = _readSerialUntill("OK", 500);
 		count++;
 		delay(RetryDelay);
 	}
@@ -2055,12 +2059,3 @@ int QuectelEC21module::numberOfDigits(uint16_t n)
 }
 
 QuectelEC21module EC21module;
-
-
-
-
-
-
-
-
-
