@@ -12,8 +12,8 @@
 #define DEFAULT_BAUD_RATE 115200
 #define TIME_OUT_READ_SERIAL 8000
 #define DOWNLOAD_CHUNK_SIZE 10240
-#define SET_AT_TIMEOUT 20000 //in ms
-#define SET_AT_RESP_TIMEOUT 2000 //in ms
+#define SET_AT_TIMEOUT 5000 //in ms
+#define SET_AT_RESP_TIMEOUT 500 //in ms
 #define ENABLE_DEBUG 0  // 0 - Disable, 1 - level1 , 2 - level2
 
 #define EC21_RESET 12
@@ -30,7 +30,7 @@ private:
   // int NumofCustonRetry[5] = {1,2,3,4,5};
   int RetryDelay = 500; //in ms
   int RetryDelay2 = 500; //in ms
-  int MAX_Count = 10;
+  int MAX_Count = 4;
   uint32_t _baud;
   String _buffer;
   bool _sleepMode;
@@ -74,7 +74,7 @@ public:
   bool Restart();
   bool hardRestart();
   bool httpContentType(uint8_t type);
-  void configureNetwork();
+  bool configureNetwork();
   uint16_t PostHTTP(String URL, String message, int type);
   uint16_t GetHTTP(String URL);
   uint16_t PutHTTP(String URL, String message, int type);
@@ -126,11 +126,3 @@ public:
 };
 extern QuectelEC21module EC21module;
 #endif
-
-
-
-
-
-
-
-
