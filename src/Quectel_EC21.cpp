@@ -230,7 +230,7 @@ bool QuectelEC21module::configureModule()
 	do
 	{
 		_Serial->print(F("AT+CMEE=2\r\n"));
-		_buffer = _readSerial(20);
+		_buffer = _readSerial(2000);
 		count++;
 		delay(RetryDelay);
 	}
@@ -251,7 +251,7 @@ bool QuectelEC21module::configureModule()
 	do
 	{
 		_Serial->print(F("AT+CREG=2\r\n"));
-		_buffer = _readSerial(20);
+		_buffer = _readSerial(2000);
 		count++;
 		delay(RetryDelay);
 	}
@@ -315,7 +315,7 @@ bool QuectelEC21module::configureModule()
 	do
 	{
 		_Serial->print(F("AT+CFUN=1\r\n"));
-		_buffer = _readSerialUntill("OK", 500);
+		_buffer = _readSerialUntill("OK", 200);
 		count++;
 		delay(RetryDelay);
 	}
@@ -330,7 +330,7 @@ bool QuectelEC21module::configureModule()
 		{
 			flag5 = 1;
 		}
-		if (flag1 == 0 || flag2 == 0 || flag3 == 0 || flag4 == 0 || flag4 == 0)
+		if (flag1 == 0 || flag2 == 0 || flag3 == 0 || flag4 == 0 || flag5 == 0)
 		{
 			return false;
 		}
@@ -765,7 +765,7 @@ String QuectelEC21module::getCurrentTime(String url)
 	{
 		if (_buffer.indexOf("+QNTP:") == -1)
 		{
-			String utcTime = "2020-10-10T09:14:30+00:00";
+			String utcTime = "1970-01-01T00:00:00+00:00";
 			return utcTime;
 		}
 		else
