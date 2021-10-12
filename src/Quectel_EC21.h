@@ -18,9 +18,9 @@
 
 #define EC21_RESET 12
 
-#define LTE_RX_PIN 5
-#define LTE_TX_PIN 2
-#define LTE_SERIAL_PORT &Serial1
+#define LTE_RX_PIN 18
+#define LTE_TX_PIN 22
+#define LTE_SERIAL_PORT &Serial2
 
 //#define Macro(x)  (((x) > (10)) ? (abc()) : 2)
 class QuectelEC21module
@@ -28,8 +28,8 @@ class QuectelEC21module
 private:
   int NumofRetry = 3;
   // int NumofCustonRetry[5] = {1,2,3,4,5};
-  int RetryDelay = 500; //in ms
-  int RetryDelay2 = 500; //in ms
+  int RetryDelay = 50; //in ms
+  int RetryDelay2 = 100; //in ms
   int MAX_Count = 4;
   uint32_t _baud;
   String _buffer;
@@ -61,7 +61,7 @@ public:
   void begin(); //Default baud 115200
   void begin(uint32_t baud);
   void begin(uint32_t baud, uint32_t config, int8_t rxPin, int8_t txPin);
-  void setup();
+  void setup(uint32_t baudRate = 115200, int RxPin = 18, int TxPin = 22);
   void basicSetup();
   bool SetAT();
   bool enableECHO();
