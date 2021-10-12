@@ -57,11 +57,11 @@ void QuectelEC21module::begin(uint32_t baud, uint32_t config, int8_t rxPin, int8
 }
 
 
-void QuectelEC21module::setup()
+void QuectelEC21module::setup(uint32_t baudRate, int RxPin, int TxPin)
 {
 	SelectSerial(LTE_SERIAL_PORT); //Select the serial port
 	delay(500);
-	begin(115200, SERIAL_8N1, LTE_RX_PIN, LTE_TX_PIN);
+	begin(baudRate, SERIAL_8N1, RxPin, TxPin);
 	initilizeModule();
 	if (initilize)
 	{	
@@ -82,12 +82,7 @@ void QuectelEC21module::setup()
 #endif
 		}
 
-		if (disConnectNetwork())
-		{
-#if ENABLE_DEBUG
-			Serial.println("Disconnected to internet");
-#endif
-		}
+		
 
 // 		if (setAPN(operaterAPN,operaterUsername,operaterPassword,operaterAuth))
 // 		{
@@ -108,6 +103,12 @@ void QuectelEC21module::setup()
 }
 
 bool QuectelEC21module::configureNetwork(){
+	if (disConnectNetwork())
+		{
+#if ENABLE_DEBUG
+			Serial.println("Disconnected to internet");
+#endif
+		}
 			if (setAPN(operaterAPN,operaterUsername,operaterPassword,operaterAuth))
 		{
 #if ENABLE_DEBUG
@@ -936,9 +937,10 @@ bool QuectelEC21module::initateHTTP()
 	uint8_t flag1;
 	uint8_t flag2;
 	int count = 0;
-	_Serial->flush();
+	
 	do
 	{
+		_Serial->flush();
 		_Serial->print(F("AT+QSSLCFG=\"SNI\",1,1\r\n"));
 		_buffer = _readSerial(1000);
 		count++;
@@ -957,9 +959,9 @@ bool QuectelEC21module::initateHTTP()
 		}
 	}
 	count = 0;
-	_Serial->flush();
 	do
 	{
+		_Serial->flush();
 		_Serial->print(F("AT+QSSLCFG=\"ciphersuite\",1,0xFFFF\r\n"));
 		_buffer = _readSerial(1000);
 		count++;
@@ -1071,9 +1073,10 @@ bool QuectelEC21module::deleteFile(String filename)
 bool QuectelEC21module::addHeader(String name,String value)
 {
 	int count = 0;
-	_Serial->flush();
+	// _Serial->flush();
 	do
 	{
+		_Serial->flush();
 		_Serial->print(F("AT+QHTTPCFG=\"custom_header\",\""));
 		_Serial->print(name + ":" + value);
 		_Serial->print(F("\"\r\n"));
@@ -1369,11 +1372,11 @@ uint16_t QuectelEC21module::PostHTTP(String URL, String message, int type)
 	uint8_t flag1;
 	uint8_t flag2;
 	int count = 0;
-	_Serial->flush();
 	initateHTTP();
 	httpContentType(type);
 	do
 	{
+		_Serial->flush();
 		delay(RetryDelay);
 		_Serial->print(F("AT+QHTTPURL=\""));
 		_Serial->print(URL);
@@ -1395,9 +1398,9 @@ uint16_t QuectelEC21module::PostHTTP(String URL, String message, int type)
 	}
 	// delay(100);
 	count = 0;
-	_Serial->flush();
 	do
 	{
+		_Serial->flush();
 		_Serial->print(F("AT+QHTTPPOST="));
 		_Serial->print(message.length());
 		_Serial->print(F(",15,15"));
@@ -1418,9 +1421,9 @@ uint16_t QuectelEC21module::PostHTTP(String URL, String message, int type)
 	}
 	// delay(100);
 	count = 0;
-	_Serial->flush();
 	do
 	{
+		_Serial->flush();
 		delay(RetryDelay);
 		_Serial->print(message + String("\r\n"));
 		_buffer = _readSerialUntill("+QHTTPPOST:",5000);
@@ -1446,11 +1449,11 @@ uint16_t QuectelEC21module::GetHTTP(String URL)
 {
 	uint8_t flag1;
 	int count = 0;
-	_Serial->flush();
 	initateHTTP();
 	// delay(100);
 	do
 	{
+		_Serial->flush();
 		delay(RetryDelay);
 		_Serial->print(F("AT+QHTTPURL=\""));
 		_Serial->print(URL);
@@ -1471,9 +1474,9 @@ uint16_t QuectelEC21module::GetHTTP(String URL)
 		}
 	}
 	count = 0;
-	_Serial->flush();
 	do
 	{
+		_Serial->flush();
 		_Serial->print(F("AT+QHTTPGET=80\r\n"));
 		_buffer = _readSerialUntill("+QHTTPGET:",5000);
 		// _buffer = _readSerial(1000);
@@ -1678,9 +1681,9 @@ uint16_t QuectelEC21module::PutHTTP(String URL, String message, int type)
 	initateHTTP();
 	httpContentType(type);
 	count = 0;
-	_Serial->flush();
 	do
 	{
+		_Serial->flush();
 		delay(RetryDelay);
 		_Serial->print(F("AT+QHTTPURL=\""));
 		_Serial->print(URL);
@@ -1702,9 +1705,9 @@ uint16_t QuectelEC21module::PutHTTP(String URL, String message, int type)
 	}
 	// delay(100);
 	count = 0;
-	_Serial->flush();
 	do
 	{
+		_Serial->flush();
 		_Serial->print(F("AT+QHTTPPUT="));
 		_Serial->print(message.length());
 		_Serial->print(F(",15,15"));
@@ -1724,9 +1727,9 @@ uint16_t QuectelEC21module::PutHTTP(String URL, String message, int type)
 	}
 	// delay(100);
 	count = 0;
-	_Serial->flush();
 	do
 	{
+		_Serial->flush();
 		delay(RetryDelay);
 		_Serial->print(message + String("\r\n"));
 		_buffer = _readSerialUntill("+QHTTPPUT:",3000);
@@ -1750,10 +1753,10 @@ uint16_t QuectelEC21module::PutHTTP(String URL, String message, int type)
 String QuectelEC21module::HTTPread()
 {
 	int count = 0;
-	_Serial->flush();
 	String response = "";
 	do
 	{
+		_Serial->flush();
 		_Serial->print(F("AT+QHTTPREAD"));
 		_Serial->print(F("\r\n"));
 		_buffer = _readSerial(1000);
@@ -1791,16 +1794,56 @@ String QuectelEC21module::SerialRead()
 ////
 //PRIVATE METHODS
 //
+// String QuectelEC21module::_readSerial()
+// {
+// 	uint64_t timeOld = millis();
+// 	while (!_Serial->available() || !(millis() > timeOld + TIME_OUT_READ_SERIAL))
+// 	{
+// 	}
+// 	String str = "";
+// 	if (_Serial->available() > 0)
+// 	{
+// 		str += (char)_Serial->read();
+// 	}
+// 	#if ENABLE_DEBUG
+// 		Serial.println(str);
+// 	#endif
+// 	return str;
+// }
+
+// String QuectelEC21module::_readSerial(uint32_t timeout)
+// {
+// 	_buffer = "";
+// 	uint64_t timeOld = millis();
+// 	while (!_Serial->available() && !(millis() > timeOld + timeout))
+// 	{
+		
+// 	}
+// 	String str = "";
+
+// 	if (_Serial->available() > 0)
+// 	{
+// 		str = _Serial->readString();
+// 	}
+// 	#if ENABLE_DEBUG
+// 		Serial.println(str);
+// 	#endif
+// 	return str;
+// }
 String QuectelEC21module::_readSerial()
 {
 	uint64_t timeOld = millis();
-	while (!_Serial->available() || !(millis() > timeOld + TIME_OUT_READ_SERIAL))
+	while (!_Serial->available() && !(millis() > timeOld + TIME_OUT_READ_SERIAL))
 	{
+		delay(35);
 	}
 	String str = "";
-	if (_Serial->available() > 0)
+	while (_Serial->available())
 	{
-		str += (char)_Serial->read();
+		if (_Serial->available() > 0)
+		{
+			str += (char)_Serial->read();
+		}
 	}
 	#if ENABLE_DEBUG
 		Serial.println(str);
@@ -1810,17 +1853,19 @@ String QuectelEC21module::_readSerial()
 
 String QuectelEC21module::_readSerial(uint32_t timeout)
 {
-	_buffer = "";
 	uint64_t timeOld = millis();
 	while (!_Serial->available() && !(millis() > timeOld + timeout))
 	{
-		
+		delay(35);
 	}
 	String str = "";
-
-	if (_Serial->available() > 0)
+	// timeOld = millis();
+	while (_Serial->available()/* && (millis() > timeOld + timeout)*/)
 	{
-		str = _Serial->readString();
+		if (_Serial->available() > 0)
+		{
+			str += (char)_Serial->read();
+		}
 	}
 	#if ENABLE_DEBUG
 		Serial.println(str);
