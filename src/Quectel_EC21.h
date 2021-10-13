@@ -61,13 +61,13 @@ public:
   void begin(); //Default baud 115200
   void begin(uint32_t baud);
   void begin(uint32_t baud, uint32_t config, int8_t rxPin, int8_t txPin);
-  void setup(uint32_t baudRate = 115200, int RxPin = 18, int TxPin = 22);
+  bool setup(uint32_t baudRate = 115200, int RxPin = 18, int TxPin = 22);
   void basicSetup();
   bool SetAT();
   bool enableECHO();
   void enable();
   void disable();
-  void initilizeModule();
+  bool initilizeModule();
   bool configureModule();
   bool checkforNetwork();
   bool initateHTTP();
