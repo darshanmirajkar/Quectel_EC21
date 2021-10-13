@@ -57,21 +57,23 @@ void QuectelEC21module::begin(uint32_t baud, uint32_t config, int8_t rxPin, int8
 }
 
 
-void QuectelEC21module::setup(uint32_t baudRate, int RxPin, int TxPin)
+bool QuectelEC21module::setup(uint32_t baudRate, int RxPin, int TxPin)
 {
 	SelectSerial(LTE_SERIAL_PORT); //Select the serial port
 	delay(500);
 	begin(baudRate, SERIAL_8N1, RxPin, TxPin);
-	initilizeModule();
+	initilize = initilizeModule();
 	if (initilize)
 	{	
 		Serial.println("Searching For network..");
 		if (checkforNetwork())
 		{
+			initilize = true;
 			Serial.println("Network Found");
 		}
 		else
 		{
+			initilize = false;
 			Serial.print(".");
 		}
 
@@ -81,24 +83,10 @@ void QuectelEC21module::setup(uint32_t baudRate, int RxPin, int TxPin)
 			Serial.println("Echo Enabled");
 #endif
 		}
-
-		
-
-// 		if (setAPN(operaterAPN,operaterUsername,operaterPassword,operaterAuth))
-// 		{
-// #if ENABLE_DEBUG
-// 			Serial.println("Set Operater APN");
-// #endif
-// 		}
-
-		// if (connectNetwork())
-		// {
-		// 	Serial.println("Connected to Internet");
-		// }
-		// else
-		// {
-		// 	Serial.println("Failed to connect Internet");
-		// }
+		return true;
+	}else{
+		Serial.println("Cellular Module Not Found");
+		return false;
 	}
 }
 
@@ -168,6 +156,7 @@ bool QuectelEC21module::SetAT()
 		if (_buffer.indexOf("OK") == -1)
 		{
 			Serial.print(".");
+			initilize = false;
 			return false;
 		}
 		else
@@ -204,7 +193,7 @@ bool QuectelEC21module::enableECHO()
 	}
 }
 
-void QuectelEC21module::initilizeModule(){
+bool QuectelEC21module::initilizeModule(){
 	if (!SPIFFS.begin(true))
 	{
 		Serial.println("SPIFFS Mount Failed");
@@ -214,8 +203,10 @@ void QuectelEC21module::initilizeModule(){
 	
 	if(configureModule()){
 		Serial.println("Configuration Successfull");
+		return true;
 	}else{
 		Serial.println("Configuration Failed");
+		return false;
 	}
 }
 
