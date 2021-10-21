@@ -307,7 +307,7 @@ bool QuectelEC21module::configureModule()
 	do
 	{
 		_Serial->print(F("AT+CFUN=1\r\n"));
-		_buffer = _readSerialUntill("OK", 200);
+		_buffer = _readSerialUntill("READY", 5000);
 		count++;
 		delay(RetryDelay);
 	}
@@ -432,7 +432,7 @@ String QuectelEC21module::getOperater()
 	do
 	{
 		_Serial->print(F("AT+COPS?\r\n"));
-		_buffer = _readSerial(2000);
+		_buffer = _readSerial(1000);
 		count++;
 		delay(RetryDelay);
 	}
@@ -623,7 +623,7 @@ String QuectelEC21module::getManufacturer()
 	do
 	{
 		_Serial->print(F("AT+GMI\r\n"));
-		_buffer = _readSerial(1000);
+		_buffer = _readSerial(1500);
 		count++;
 		delay(RetryDelay2);
 	}
@@ -1834,6 +1834,7 @@ String QuectelEC21module::_readSerial()
 		if (_Serial->available() > 0)
 		{
 			str += (char)_Serial->read();
+			delay(1);
 		}
 	}
 	#if ENABLE_DEBUG
@@ -1856,6 +1857,7 @@ String QuectelEC21module::_readSerial(uint32_t timeout)
 		if (_Serial->available() > 0)
 		{
 			str += (char)_Serial->read();
+			delay(1);
 		}
 	}
 	#if ENABLE_DEBUG
