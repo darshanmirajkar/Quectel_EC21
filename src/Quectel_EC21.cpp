@@ -217,12 +217,13 @@ bool QuectelEC21module::configureModule()
 	uint8_t flag3;
 	uint8_t flag4;
 	uint8_t flag5;
+	uint8_t flag6;
 	int count = 0;
 	_Serial->flush();
 	do
 	{
 		_Serial->print(F("AT+CMEE=2\r\n"));
-		_buffer = _readSerial(2000);
+		_buffer = _readSerial(3000);
 		count++;
 		delay(RetryDelay);
 	}
@@ -307,7 +308,7 @@ bool QuectelEC21module::configureModule()
 	do
 	{
 		_Serial->print(F("AT+CFUN=1\r\n"));
-		_buffer = _readSerialUntill("READY", 5000);
+		_buffer = _readSerialUntill("OK", 5000);
 		count++;
 		delay(RetryDelay);
 	}
@@ -322,7 +323,28 @@ bool QuectelEC21module::configureModule()
 		{
 			flag5 = 1;
 		}
-		if (flag1 == 0 || flag2 == 0 || flag3 == 0 || flag4 == 0 || flag5 == 0)
+	}
+	count = 0;
+	_Serial->flush();
+	do
+	{
+		_Serial->print(F("AT+CPIN?\r\n"));
+		_buffer = _readSerial(2000);
+		count++;
+		delay(RetryDelay);
+	}
+
+	while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("READY") == -1);
+	{
+		if (_buffer.indexOf("READY") == -1)
+		{
+			flag6 = 0;
+		}
+		else
+		{
+			flag6 = 1;
+		}
+		if (flag1 == 0 || flag2 == 0 || flag3 == 0 || flag4 == 0 || flag5 == 0 || flag6 == 0)
 		{
 			return false;
 		}
