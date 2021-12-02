@@ -217,13 +217,12 @@ bool QuectelEC21module::configureModule()
 	uint8_t flag3;
 	uint8_t flag4;
 	uint8_t flag5;
-	uint8_t flag6;
 	int count = 0;
 	_Serial->flush();
 	do
 	{
 		_Serial->print(F("AT+CMEE=2\r\n"));
-		_buffer = _readSerial(3000);
+		_buffer = _readSerial(2000);
 		count++;
 		delay(RetryDelay);
 	}
@@ -308,7 +307,7 @@ bool QuectelEC21module::configureModule()
 	do
 	{
 		_Serial->print(F("AT+CFUN=1\r\n"));
-		_buffer = _readSerialUntill("OK", 5000);
+		_buffer = _readSerialUntill("READY", 5000);
 		count++;
 		delay(RetryDelay);
 	}
@@ -323,28 +322,7 @@ bool QuectelEC21module::configureModule()
 		{
 			flag5 = 1;
 		}
-	}
-	count = 0;
-	_Serial->flush();
-	do
-	{
-		_Serial->print(F("AT+CPIN?\r\n"));
-		_buffer = _readSerial(2000);
-		count++;
-		delay(RetryDelay);
-	}
-
-	while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("READY") == -1);
-	{
-		if (_buffer.indexOf("READY") == -1)
-		{
-			flag6 = 0;
-		}
-		else
-		{
-			flag6 = 1;
-		}
-		if (flag1 == 0 || flag2 == 0 || flag3 == 0 || flag4 == 0 || flag5 == 0 || flag6 == 0)
+		if (flag1 == 0 || flag2 == 0 || flag3 == 0 || flag4 == 0 || flag5 == 0)
 		{
 			return false;
 		}
@@ -945,7 +923,7 @@ bool QuectelEC21module::httpContentType(uint8_t type)
 	}
 }
 
-bool QuectelEC21module::initateHTTP()
+bool QuectelEC21module::initateHTTP(bool enable)
 {
 	uint8_t flag1;
 	uint8_t flag2;
@@ -954,7 +932,9 @@ bool QuectelEC21module::initateHTTP()
 	do
 	{
 		_Serial->flush();
-		_Serial->print(F("AT+QSSLCFG=\"SNI\",1,1\r\n"));
+		_Serial->print(F("AT+QSSLCFG=\"SNI\",1,"));
+		_Serial->print(enable);
+		_Serial->print(F("\r\n"));
 		_buffer = _readSerial(1000);
 		count++;
 		delay(RetryDelay);
@@ -1517,7 +1497,7 @@ int QuectelEC21module::downloadUpdate(const char *URL, char *md5Checksum)
 	uint8_t flag3;
 	size_t size = 0;
 	int count = 0;
-	initateHTTP();
+	initateHTTP(false);
 	// httpContentType(2);
 	// delay(100);
 
@@ -1607,7 +1587,7 @@ bool QuectelEC21module::downloadFile(const char *URL, const char *filename)
 	uint8_t flag3;
 	size_t size = 0;
 	int count = 0;
-	initateHTTP();
+	initateHTTP(false);
 	httpContentType(2);
 	_Serial->flush();
 	count = 0;
@@ -1772,7 +1752,7 @@ String QuectelEC21module::HTTPread()
 		_Serial->flush();
 		_Serial->print(F("AT+QHTTPREAD"));
 		_Serial->print(F("\r\n"));
-		_buffer = _readSerial(1000);
+		_buffer = _readSerialString(1000);
 		count++;
 		delay(RetryDelay);
 	} while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("OK") == -1);
@@ -1881,6 +1861,25 @@ String QuectelEC21module::_readSerial(uint32_t timeout)
 			str += (char)_Serial->read();
 			delay(1);
 		}
+	}
+	#if ENABLE_DEBUG
+		Serial.println(str);
+	#endif
+	return str;
+}
+
+String QuectelEC21module::_readSerialString(uint32_t timeout)
+{
+	uint64_t timeOld = millis();
+	while (!_Serial->available() && !(millis() > timeOld + timeout))
+	{
+		
+	}
+	String str = "";
+
+	if (_Serial->available() > 0)
+	{
+		str = _Serial->readString();
 	}
 	#if ENABLE_DEBUG
 		Serial.println(str);
