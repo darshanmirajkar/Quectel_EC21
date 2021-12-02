@@ -56,15 +56,14 @@ void QuectelEC21module::begin(uint32_t baud, uint32_t config, int8_t rxPin, int8
 	_buffer.reserve(BUFFER_RESERVE_MEMORY);
 }
 
-
 bool QuectelEC21module::setup(uint32_t baudRate, int RxPin, int TxPin)
 {
-	SelectSerial(LTE_SERIAL_PORT); //Select the serial port
+	SelectSerial(LTE_SERIAL_PORT); // Select the serial port
 	delay(500);
 	begin(baudRate, SERIAL_8N1, RxPin, TxPin);
 	initilize = initilizeModule();
 	if (initilize)
-	{	
+	{
 		Serial.println("Searching For network..");
 		if (checkforNetwork())
 		{
@@ -84,41 +83,44 @@ bool QuectelEC21module::setup(uint32_t baudRate, int RxPin, int TxPin)
 #endif
 		}
 		return true;
-	}else{
+	}
+	else
+	{
 		Serial.println("Cellular Module Not Found");
 		return false;
 	}
 }
 
-bool QuectelEC21module::configureNetwork(){
+bool QuectelEC21module::configureNetwork()
+{
 	if (disConnectNetwork())
-		{
+	{
 #if ENABLE_DEBUG
-			Serial.println("Disconnected to internet");
+		Serial.println("Disconnected to internet");
 #endif
-		}
-			if (setAPN(operaterAPN,operaterUsername,operaterPassword,operaterAuth))
-		{
+	}
+	if (setAPN(operaterAPN, operaterUsername, operaterPassword, operaterAuth))
+	{
 #if ENABLE_DEBUG
-			Serial.println("Set Operater APN");
+		Serial.println("Set Operater APN");
 #endif
-		}
+	}
 
-		if (connectNetwork())
-		{
-			Serial.println("Connected to Internet");
-			return true;
-		}
-		else
-		{
-			Serial.println("Failed to connect Internet");
-			return false;
-		}
+	if (connectNetwork())
+	{
+		Serial.println("Connected to Internet");
+		return true;
+	}
+	else
+	{
+		Serial.println("Failed to connect Internet");
+		return false;
+	}
 }
 
 void QuectelEC21module::basicSetup()
 {
-	SelectSerial(LTE_SERIAL_PORT); //Select the serial port
+	SelectSerial(LTE_SERIAL_PORT); // Select the serial port
 	begin(115200, SERIAL_8N1, LTE_RX_PIN, LTE_TX_PIN);
 	initilizeModule();
 	Serial.println("Searching For network..");
@@ -163,7 +165,7 @@ bool QuectelEC21module::SetAT()
 		{
 			Serial.println("AT command Success");
 			initilize = true;
-			Serial.println("GSM init main: "+String(initilize));
+			Serial.println("GSM init main: " + String(initilize));
 			return true;
 		}
 	}
@@ -193,18 +195,23 @@ bool QuectelEC21module::enableECHO()
 	}
 }
 
-bool QuectelEC21module::initilizeModule(){
+bool QuectelEC21module::initilizeModule()
+{
 	if (!SPIFFS.begin(true))
 	{
 		Serial.println("SPIFFS Mount Failed");
 	}
 	uint64_t timeOld = millis();
-	while ((millis() < timeOld + SET_AT_TIMEOUT) && !SetAT());
-	
-	if(configureModule()){
+	while ((millis() < timeOld + SET_AT_TIMEOUT) && !SetAT())
+		;
+
+	if (configureModule())
+	{
 		Serial.println("Configuration Successfull");
 		return true;
-	}else{
+	}
+	else
+	{
 		Serial.println("Configuration Failed");
 		return false;
 	}
@@ -501,7 +508,7 @@ String QuectelEC21module::getBandInfo()
 	}
 }
 
-bool QuectelEC21module::setAPN(const char *apn, const char* username, const char *password, int auth)
+bool QuectelEC21module::setAPN(const char *apn, const char *username, const char *password, int auth)
 {
 	int count = 0;
 	_Serial->flush();
@@ -725,7 +732,7 @@ void QuectelEC21module::getSimInfo()
 		band = getBandInfo();
 		rssi = getRssi();
 		simNum = getSimNumber();
-		
+
 		Serial.println("Operater   : " + operater);
 		Serial.println("Technology : " + techonology);
 		Serial.println("Band       : " + band);
@@ -740,7 +747,7 @@ void QuectelEC21module::getSimInfo()
 
 String QuectelEC21module::getCurrentTime(String url)
 {
-	
+
 	int count = 0;
 	_Serial->flush();
 	do
@@ -762,16 +769,14 @@ String QuectelEC21module::getCurrentTime(String url)
 		}
 		else
 		{
-			String fullTime  = midString(_buffer,"+QNTP: 0,\"","\"");
-			fullTime.replace("/","-");
-			fullTime.replace(",","T");
+			String fullTime = midString(_buffer, "+QNTP: 0,\"", "\"");
+			fullTime.replace("/", "-");
+			fullTime.replace(",", "T");
 			Serial.println(fullTime);
 			return fullTime;
 		}
 	}
-	
 }
-
 
 bool QuectelEC21module::connectNetwork()
 {
@@ -798,10 +803,13 @@ bool QuectelEC21module::connectNetwork()
 		}
 	}
 	String cellularIP = getIPAddress();
-	Serial.println("Cellular IPAddress : "+ cellularIP);
-	if(cellularIP == "0.0.0.0"){
+	Serial.println("Cellular IPAddress : " + cellularIP);
+	if (cellularIP == "0.0.0.0")
+	{
 		flag = false;
-	}else{
+	}
+	else
+	{
 		flag = true;
 	}
 	return flag;
@@ -827,7 +835,7 @@ String QuectelEC21module::getIPAddress()
 		}
 		else
 		{
-			return midString(_buffer,"\"","\"");
+			return midString(_buffer, "\"", "\"");
 		}
 	}
 }
@@ -923,18 +931,17 @@ bool QuectelEC21module::httpContentType(uint8_t type)
 	}
 }
 
-bool QuectelEC21module::initateHTTP(bool enable)
+bool QuectelEC21module::initateHTTP()
 {
 	uint8_t flag1;
 	uint8_t flag2;
+	uint8_t flag3;
 	int count = 0;
-	
+
 	do
 	{
 		_Serial->flush();
-		_Serial->print(F("AT+QSSLCFG=\"SNI\",1,"));
-		_Serial->print(enable);
-		_Serial->print(F("\r\n"));
+		_Serial->print(F("AT+QSSLCFG=\"SNI\",1,1\r\n"));
 		_buffer = _readSerial(1000);
 		count++;
 		delay(RetryDelay);
@@ -972,14 +979,16 @@ bool QuectelEC21module::initateHTTP(bool enable)
 			flag2 = 1;
 		}
 	}
-	if (flag1 == 0 || flag2 == 0)
-		{
-			return false;
-		}
-		else
-		{
-			return true;
-		}
+	
+	
+	if (flag1 == 0 || flag2 == 0 || flag3 == 0)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
 
 bool QuectelEC21module::ping(String url)
@@ -993,7 +1002,7 @@ bool QuectelEC21module::ping(String url)
 		_Serial->print(F("AT+QPING=1,\""));
 		_Serial->print(url);
 		_Serial->print(F("\",10,5\r\n"));
-		_buffer = _readSerialUntill("+QPING: 0,5,5",10000);
+		_buffer = _readSerialUntill("+QPING: 0,5,5", 10000);
 		count++;
 		delay(5000);
 	}
@@ -1063,7 +1072,7 @@ bool QuectelEC21module::deleteFile(String filename)
 	}
 }
 
-bool QuectelEC21module::addHeader(String name,String value)
+bool QuectelEC21module::addHeader(String name, String value)
 {
 	int count = 0;
 	// _Serial->flush();
@@ -1360,7 +1369,7 @@ int QuectelEC21module::readFile(const char *filename)
 
 uint16_t QuectelEC21module::PostHTTP(String URL, String message, int type)
 {
-	
+
 	// delay(100);
 	uint8_t flag1;
 	uint8_t flag2;
@@ -1398,7 +1407,7 @@ uint16_t QuectelEC21module::PostHTTP(String URL, String message, int type)
 		_Serial->print(message.length());
 		_Serial->print(F(",15,15"));
 		_Serial->print(F("\r\n"));
-		_buffer = _readSerialUntill("CONNECT",5000);
+		_buffer = _readSerialUntill("CONNECT", 5000);
 		// _buffer = _readSerial(5000);
 		count++;
 	} while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("CONNECT") == -1);
@@ -1419,7 +1428,7 @@ uint16_t QuectelEC21module::PostHTTP(String URL, String message, int type)
 		_Serial->flush();
 		delay(RetryDelay);
 		_Serial->print(message + String("\r\n"));
-		_buffer = _readSerialUntill("+QHTTPPOST:",5000);
+		_buffer = _readSerialUntill("+QHTTPPOST:", 5000);
 		// _buffer = _readSerial(5000);
 		count++;
 
@@ -1431,7 +1440,7 @@ uint16_t QuectelEC21module::PostHTTP(String URL, String message, int type)
 		}
 		else
 		{
-			String response = midString(_buffer,",",",");
+			String response = midString(_buffer, ",", ",");
 			return (uint16_t)response.toInt();
 		}
 	}
@@ -1471,7 +1480,7 @@ uint16_t QuectelEC21module::GetHTTP(String URL)
 	{
 		_Serial->flush();
 		_Serial->print(F("AT+QHTTPGET=80\r\n"));
-		_buffer = _readSerialUntill("+QHTTPGET:",5000);
+		_buffer = _readSerialUntill("+QHTTPGET:", 10000);
 		// _buffer = _readSerial(1000);
 		count++;
 	} while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("+QHTTPGET:") == -1);
@@ -1482,10 +1491,9 @@ uint16_t QuectelEC21module::GetHTTP(String URL)
 		}
 		else
 		{
-			String response = midString(_buffer,",",",");
+			String response = midString(_buffer, ",", ",");
 			return (uint16_t)response.toInt();
 		}
-		
 	}
 	// delay(100);
 }
@@ -1497,7 +1505,7 @@ int QuectelEC21module::downloadUpdate(const char *URL, char *md5Checksum)
 	uint8_t flag3;
 	size_t size = 0;
 	int count = 0;
-	initateHTTP(false);
+	initateHTTP();
 	// httpContentType(2);
 	// delay(100);
 
@@ -1563,7 +1571,8 @@ int QuectelEC21module::downloadUpdate(const char *URL, char *md5Checksum)
 		else
 		{
 			flag3 = 1;
-			if(updateESP(md5Checksum) == -1){
+			if (updateESP(md5Checksum) == -1)
+			{
 				flag3 = -1;
 			}
 		}
@@ -1587,7 +1596,7 @@ bool QuectelEC21module::downloadFile(const char *URL, const char *filename)
 	uint8_t flag3;
 	size_t size = 0;
 	int count = 0;
-	initateHTTP(false);
+	initateHTTP();
 	httpContentType(2);
 	_Serial->flush();
 	count = 0;
@@ -1725,7 +1734,7 @@ uint16_t QuectelEC21module::PutHTTP(String URL, String message, int type)
 		_Serial->flush();
 		delay(RetryDelay);
 		_Serial->print(message + String("\r\n"));
-		_buffer = _readSerialUntill("+QHTTPPUT:",3000);
+		_buffer = _readSerialUntill("+QHTTPPUT:", 3000);
 		count++;
 
 	} while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("+QHTTPPUT:") == -1);
@@ -1736,7 +1745,7 @@ uint16_t QuectelEC21module::PutHTTP(String URL, String message, int type)
 		}
 		else
 		{
-			String response = midString(_buffer,",",",");
+			String response = midString(_buffer, ",", ",");
 			return (uint16_t)response.toInt();
 		}
 	}
@@ -1785,24 +1794,24 @@ String QuectelEC21module::SerialRead()
 
 //
 ////
-//PRIVATE METHODS
+// PRIVATE METHODS
 //
-// String QuectelEC21module::_readSerial()
-// {
-// 	uint64_t timeOld = millis();
-// 	while (!_Serial->available() || !(millis() > timeOld + TIME_OUT_READ_SERIAL))
-// 	{
-// 	}
-// 	String str = "";
-// 	if (_Serial->available() > 0)
-// 	{
-// 		str += (char)_Serial->read();
-// 	}
-// 	#if ENABLE_DEBUG
-// 		Serial.println(str);
-// 	#endif
-// 	return str;
-// }
+//  String QuectelEC21module::_readSerial()
+//  {
+//  	uint64_t timeOld = millis();
+//  	while (!_Serial->available() || !(millis() > timeOld + TIME_OUT_READ_SERIAL))
+//  	{
+//  	}
+//  	String str = "";
+//  	if (_Serial->available() > 0)
+//  	{
+//  		str += (char)_Serial->read();
+//  	}
+//  	#if ENABLE_DEBUG
+//  		Serial.println(str);
+//  	#endif
+//  	return str;
+//  }
 
 // String QuectelEC21module::_readSerial(uint32_t timeout)
 // {
@@ -1810,7 +1819,7 @@ String QuectelEC21module::SerialRead()
 // 	uint64_t timeOld = millis();
 // 	while (!_Serial->available() && !(millis() > timeOld + timeout))
 // 	{
-		
+
 // 	}
 // 	String str = "";
 
@@ -1839,9 +1848,9 @@ String QuectelEC21module::_readSerial()
 			delay(1);
 		}
 	}
-	#if ENABLE_DEBUG
-		Serial.println(str);
-	#endif
+#if ENABLE_DEBUG
+	Serial.println(str);
+#endif
 	return str;
 }
 
@@ -1854,7 +1863,7 @@ String QuectelEC21module::_readSerial(uint32_t timeout)
 	}
 	String str = "";
 	// timeOld = millis();
-	while (_Serial->available()/* && (millis() > timeOld + timeout)*/)
+	while (_Serial->available() /* && (millis() > timeOld + timeout)*/)
 	{
 		if (_Serial->available() > 0)
 		{
@@ -1862,9 +1871,9 @@ String QuectelEC21module::_readSerial(uint32_t timeout)
 			delay(1);
 		}
 	}
-	#if ENABLE_DEBUG
-		Serial.println(str);
-	#endif
+#if ENABLE_DEBUG
+	Serial.println(str);
+#endif
 	return str;
 }
 
@@ -1873,7 +1882,6 @@ String QuectelEC21module::_readSerialString(uint32_t timeout)
 	uint64_t timeOld = millis();
 	while (!_Serial->available() && !(millis() > timeOld + timeout))
 	{
-		
 	}
 	String str = "";
 
@@ -1881,9 +1889,9 @@ String QuectelEC21module::_readSerialString(uint32_t timeout)
 	{
 		str = _Serial->readString();
 	}
-	#if ENABLE_DEBUG
-		Serial.println(str);
-	#endif
+#if ENABLE_DEBUG
+	Serial.println(str);
+#endif
 	return str;
 }
 
@@ -1897,9 +1905,9 @@ String QuectelEC21module::_readSerialUntill(String buff, uint32_t timeout)
 	{
 		Serial.print(".");
 		str = _Serial->readString();
-		#if ENABLE_DEBUG
-			Serial.println(str);
-		#endif
+#if ENABLE_DEBUG
+		Serial.println(str);
+#endif
 		if (str.indexOf(buff) == -1)
 		{
 		}
@@ -1908,9 +1916,9 @@ String QuectelEC21module::_readSerialUntill(String buff, uint32_t timeout)
 			break;
 		}
 	}
-	#if ENABLE_DEBUG
-		Serial.println(str);
-	#endif
+#if ENABLE_DEBUG
+	Serial.println(str);
+#endif
 	Serial.print("\r\n");
 	return str;
 }
@@ -2006,10 +2014,9 @@ String QuectelEC21module::storeFile(uint16_t rxBuffersize, uint32_t timeout)
 	int count = 0;
 	size = _Serial->available();
 
-	#if ENABLE_DEBUG > 1
-		Serial.println("Size : "+String(size));
-	#endif
-	
+#if ENABLE_DEBUG > 1
+	Serial.println("Size : " + String(size));
+#endif
 
 	while (_Serial->available() || !(millis() > timeOld + timeout))
 	{
@@ -2028,9 +2035,9 @@ String QuectelEC21module::storeFile(uint16_t rxBuffersize, uint32_t timeout)
 		}
 		count++;
 	}
-	#if ENABLE_DEBUG > 1
-		Serial.println(str);
-	#endif
+#if ENABLE_DEBUG > 1
+	Serial.println(str);
+#endif
 	return str;
 }
 
@@ -2069,9 +2076,9 @@ String QuectelEC21module::storeFile(File f, uint16_t rxBuffersize, uint32_t time
 	int count = 0;
 	size = _Serial->available();
 
-	#if ENABLE_DEBUG > 1
-		Serial.println("Size : "+String(size));
-	#endif
+#if ENABLE_DEBUG > 1
+	Serial.println("Size : " + String(size));
+#endif
 
 	while (_Serial->available() || !(millis() > timeOld + timeout))
 	{
@@ -2089,9 +2096,9 @@ String QuectelEC21module::storeFile(File f, uint16_t rxBuffersize, uint32_t time
 		}
 		count++;
 	}
-	#if ENABLE_DEBUG > 1
-		Serial.println(str);
-	#endif
+#if ENABLE_DEBUG > 1
+	Serial.println(str);
+#endif
 	return str;
 }
 
