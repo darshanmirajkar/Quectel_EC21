@@ -14,7 +14,7 @@
 #define DOWNLOAD_CHUNK_SIZE 10240
 #define SET_AT_TIMEOUT 5000 //in ms
 #define SET_AT_RESP_TIMEOUT 500 //in ms
-#define ENABLE_DEBUG 0  // 0 - Disable, 1 - level1 , 2 - level2
+#define ENABLE_DEBUG 1  // 0 - Disable, 1 - level1 , 2 - level2
 
 #define EC21_RESET 12
 
@@ -37,6 +37,7 @@ private:
   String _readSerial();
   String _readSerial(uint32_t timeout);
   String _readSerialUntill(String buff, uint32_t timeout);
+  String _readSerialString(uint32_t timeout);
   String storeFile(uint16_t rxBuffersize, uint32_t timeout);
   String storeFile(File f, uint16_t rxBuffersize, uint32_t timeout);
   String midString(String str, String start, String finish);
@@ -70,7 +71,7 @@ public:
   bool initilizeModule();
   bool configureModule();
   bool checkforNetwork();
-  bool initateHTTP();
+  bool initateHTTP(bool enable = true);
   bool Restart();
   bool hardRestart();
   bool httpContentType(uint8_t type);
