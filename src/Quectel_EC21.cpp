@@ -266,12 +266,13 @@ bool QuectelEC21module::configureModule()
 			flag2 = 1;
 		}
 	}
+	
 	count = 0;
 	_Serial->flush();
 	do
 	{
-		_Serial->print(F("AT+QCFG=\"roamservice\",255,1\r\n"));
-		_buffer = _readSerial(20);
+		_Serial->print(F("AT+CFUN=0\r\n"));
+		_buffer = _readSerialUntill("OK", 5000);
 		count++;
 		delay(RetryDelay);
 	}
@@ -287,12 +288,13 @@ bool QuectelEC21module::configureModule()
 			flag3 = 1;
 		}
 	}
+	// delay(2000);
 	count = 0;
 	_Serial->flush();
 	do
 	{
-		_Serial->print(F("AT+CFUN=0\r\n"));
-		_buffer = _readSerial(200);
+		_Serial->print(F("AT+CFUN=1\r\n"));
+		_buffer = _readSerialUntill("OK", 5000);
 		count++;
 		delay(RetryDelay);
 	}
@@ -307,21 +309,21 @@ bool QuectelEC21module::configureModule()
 		{
 			flag4 = 1;
 		}
+		
 	}
-	// delay(2000);
 	count = 0;
 	_Serial->flush();
 	do
 	{
-		_Serial->print(F("AT+CFUN=1\r\n"));
-		_buffer = _readSerialUntill("READY", 5000);
+		_Serial->print(F("AT+CPIN?\r\n"));
+		_buffer = _readSerial(20);
 		count++;
 		delay(RetryDelay);
 	}
 
-	while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("OK") == -1);
+	while ((count < NumofRetry && count < MAX_Count) && _buffer.indexOf("READY") == -1);
 	{
-		if (_buffer.indexOf("OK") == -1)
+		if (_buffer.indexOf("READY") == -1)
 		{
 			flag5 = 0;
 		}
@@ -329,7 +331,8 @@ bool QuectelEC21module::configureModule()
 		{
 			flag5 = 1;
 		}
-		if (flag1 == 0 || flag2 == 0 || flag3 == 0 || flag4 == 0 || flag5 == 0)
+	}
+	if (flag1 == 0 || flag2 == 0 || flag3 == 0 || flag4 == 0 || flag5 == 0)
 		{
 			return false;
 		}
@@ -337,7 +340,6 @@ bool QuectelEC21module::configureModule()
 		{
 			return true;
 		}
-	}
 }
 
 bool QuectelEC21module::checkforNetwork()
